@@ -5,6 +5,8 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+
+
 android {
     namespace = "com.example.ungdung_dat_mon_an"
     compileSdk = flutter.compileSdkVersion
@@ -16,8 +18,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
+        jvmTarget = "17"    }
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
@@ -38,6 +39,9 @@ android {
         }
     }
 }
+
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")}
 
 flutter {
     source = "../.."

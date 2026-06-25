@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import '../auth/login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -19,9 +20,11 @@ class WelcomeScreen extends StatelessWidget {
                 // LOGO + NÚT ẨN
                 GestureDetector(
                   onDoubleTap: () {
-                    // Chuyển sang trang Đăng nhập cho Quản lý/Bếp
-                    print("Chuyển sang trang Admin/Staff");
-                    // Navigator.push(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+                    // Nhấn đúp vào Logo sẽ chuyển sang trang Đăng nhập
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    );
                   },
                   child: Hero(
                     tag: 'logo',
