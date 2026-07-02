@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/models/menu_data.dart';
+import '../../providers/cart_provider.dart';
+import '../../widgets/cart_view_widget.dart';
+import '../../widgets/order_history_widget.dart';
 
 /// Màn hình E-Menu chính — bố cục landscape cho iPad
 /// Gồm: Top Nav Bar, Left Category Sidebar, Center Food Grid, Right Detail Panel
 class EMenuScreen extends StatefulWidget {
-  const EMenuScreen({super.key});
+  final String tableInfo;
+
+  const EMenuScreen({super.key, this.tableInfo = 'A-01'});
 
   @override
   State<EMenuScreen> createState() => _EMenuScreenState();
@@ -28,16 +35,6 @@ class _EMenuScreenState extends State<EMenuScreen> {
       buffer.write(str[i]);
     }
     return '${buffer.toString()} đ';
-  }
-
-  /// Lọc items theo search query
-  List<MenuItem> get _filteredItems {
-    final items = menuData[_activeCategoryIdx].items;
-    if (_searchQuery.isEmpty) return items;
-    return items
-        .where((item) =>
-            item.name.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
   }
 
   /// Icon tương ứng cho từng loại danh mục
@@ -91,19 +88,52 @@ class _EMenuScreenState extends State<EMenuScreen> {
 
             // ═══════ MAIN BODY ═══════
             Expanded(
-              child: Row(
-                children: [
-                  // ═══════ 2. LEFT CATEGORY SIDEBAR ═══════
-                  _buildCategorySidebar(),
+              child: _activeTab == 1
+                  ? CartViewWidget(tableInfo: widget.tableInfo)
+                  : _activeTab == 2
+                      ? OrderHistoryWidget(tableInfo: widget.tableInfo)
+                      : StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance.collection('menu').snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
 
-                  // ═══════ 3. CENTER FOOD GRID ═══════
-                  Expanded(child: _buildFoodGrid()),
+                            final allItems = snapshot.data?.docs.map((doc) => MenuItem.fromMap(doc.id, doc.data() as Map<String, dynamic>)).where((item) => item.isAvailable).toList() ?? [];
 
-                  // ═══════ 4. RIGHT DETAIL PANEL ═══════
-                  if (_selectedItem != null)
-                    _buildDetailPanel(_selectedItem!),
-                ],
-              ),
+                            // Group items by category
+                            final Map<String, List<MenuItem>> grouped = {};
+                            for (var item in allItems) {
+                              if (!grouped.containsKey(item.category)) grouped[item.category] = [];
+                              grouped[item.category]!.add(item);
+                            }
+
+                            final categories = grouped.keys.toList();
+                            if (categories.isEmpty) {
+                              return const Center(child: Text('Chưa có thực đơn'));
+                            }
+
+                            if (_activeCategoryIdx >= categories.length) {
+                              _activeCategoryIdx = 0; // Reset if out of bounds
+                            }
+
+                            final currentCategoryItems = grouped[categories[_activeCategoryIdx]]!;
+
+                            return Row(
+                              children: [
+                                // ═══════ 2. LEFT CATEGORY SIDEBAR ═══════
+                                _buildCategorySidebarDynamic(categories),
+
+                                // ═══════ 3. CENTER FOOD GRID ═══════
+                                Expanded(child: _buildFoodGridDynamic(categories[_activeCategoryIdx], currentCategoryItems)),
+
+                                // ═══════ 4. RIGHT DETAIL PANEL ═══════
+                                if (_selectedItem != null)
+                                  _buildDetailPanel(_selectedItem!),
+                              ],
+                            );
+                          },
+                        ),
             ),
           ],
         ),
@@ -163,7 +193,7 @@ class _EMenuScreenState extends State<EMenuScreen> {
                           size: 16, color: AppColors.primary),
                       const SizedBox(width: 6),
                       Text(
-                        'Bàn số: 05',
+                        'Bàn số: ${widget.tableInfo}',
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w600,
@@ -282,68 +312,75 @@ class _EMenuScreenState extends State<EMenuScreen> {
   }
 
   // ═══════════════════════════════════════════════
-  //  LEFT CATEGORY SIDEBAR
+  //  LEFT CATEGORY SIDEBAR DYNAMIC
   // ═══════════════════════════════════════════════
-  Widget _buildCategorySidebar() {
+  Widget _buildCategorySidebarDynamic(List<String> categories) {
     return Container(
-      width: 200,
+      width: 100,
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(right: BorderSide(color: Colors.grey[200]!)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(2, 0),
+          ),
+        ],
       ),
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: menuData.length,
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        itemCount: categories.length,
         itemBuilder: (context, index) {
-          final cat = menuData[index];
-          final isActive = index == _activeCategoryIdx;
-
+          final isSelected = index == _activeCategoryIdx;
           return GestureDetector(
             onTap: () {
               setState(() {
                 _activeCategoryIdx = index;
-                _selectedItem = null;
                 _searchQuery = '';
                 _searchController.clear();
               });
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: BoxDecoration(
-                color: isActive
-                    ? AppColors.primary.withOpacity(0.05)
-                    : Colors.transparent,
-                border: Border(
-                  right: BorderSide(
-                    color:
-                        isActive ? AppColors.primary : Colors.transparent,
-                    width: 4,
-                  ),
-                ),
-              ),
-              child: Row(
+              color: isSelected
+                  ? AppColors.primary.withOpacity(0.05)
+                  : Colors.transparent,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
                 children: [
-                  Icon(
-                    _getCategoryIcon(cat.icon),
-                    size: 20,
-                    color: isActive ? AppColors.primary : Colors.grey[400],
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      cat.shortName,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight:
-                            isActive ? FontWeight.w600 : FontWeight.w500,
-                        color: isActive
-                            ? AppColors.primary
-                            : Colors.grey[600],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primary : Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.fastfood,
+                      color: isSelected ? Colors.white : Colors.grey[400],
+                      size: 28,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    categories[index],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isSelected ? AppColors.primary : Colors.grey[400],
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontSize: 12,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (isSelected)
+                    Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    )
                 ],
               ),
             ),
@@ -354,10 +391,13 @@ class _EMenuScreenState extends State<EMenuScreen> {
   }
 
   // ═══════════════════════════════════════════════
-  //  CENTER FOOD GRID
+  //  CENTER FOOD GRID DYNAMIC
   // ═══════════════════════════════════════════════
-  Widget _buildFoodGrid() {
-    final items = _filteredItems;
+  Widget _buildFoodGridDynamic(String categoryName, List<MenuItem> rawItems) {
+    List<MenuItem> items = List.from(rawItems);
+    if (_searchQuery.isNotEmpty) {
+      items = items.where((item) => item.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+    }
 
     return Container(
       color: AppColors.background,
@@ -370,7 +410,7 @@ class _EMenuScreenState extends State<EMenuScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  menuData[_activeCategoryIdx].category,
+                  categoryName,
                   style: const TextStyle(
                     fontFamily: 'Playfair Display',
                     fontSize: 24,
@@ -796,6 +836,8 @@ class _EMenuScreenState extends State<EMenuScreen> {
                   height: 52,
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      Provider.of<CartProvider>(context, listen: false)
+                          .addItem(item, quantity: _quantity);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(

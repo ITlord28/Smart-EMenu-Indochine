@@ -7,6 +7,8 @@ class MenuItem {
   final List<String> ingredients;
   final String imageUrl;
   final bool isAvailable;
+  final int tfp; // Time For Preparation in minutes
+  final String category; // Category name
 
   const MenuItem({
     required this.id,
@@ -16,7 +18,36 @@ class MenuItem {
     required this.ingredients,
     required this.imageUrl,
     this.isAvailable = true,
+    this.tfp = 10,
+    this.category = 'Khác',
   });
+
+  factory MenuItem.fromMap(String id, Map<String, dynamic> map) {
+    return MenuItem(
+      id: id,
+      name: map['name'] ?? '',
+      price: map['price']?.toInt() ?? 0,
+      description: map['description'] ?? '',
+      ingredients: List<String>.from(map['ingredients'] ?? []),
+      imageUrl: map['imageUrl'] ?? '',
+      isAvailable: map['isAvailable'] ?? true,
+      tfp: map['tfp']?.toInt() ?? 10,
+      category: map['category'] ?? 'Khác',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'price': price,
+      'description': description,
+      'ingredients': ingredients,
+      'imageUrl': imageUrl,
+      'isAvailable': isAvailable,
+      'tfp': tfp,
+      'category': category,
+    };
+  }
 }
 
 /// Model cho một danh mục món

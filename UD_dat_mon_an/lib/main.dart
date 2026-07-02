@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_core/firebase_core.dart'; // Thư viện lõi Firebase
-import 'firebase_options.dart'; // File cấu hình bạn vừa generate
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'core/constants/app_colors.dart';
-import 'screens/welcome/welcome_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'core/utils/dummy_data_generator.dart';
 
-// Bắt buộc phải thêm từ khóa 'async' vào hàm main
+import 'package:provider/provider.dart';
+import 'providers/cart_provider.dart';
+
 void main() async {
-  // Đảm bảo Flutter đã sẵn sàng
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Khởi tạo Firebase ngay khi mở app
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Khóa màn hình ngang cho Tablet
+  // Gọi hàm seedData (chạy nền, không block UI)
+  DummyDataGenerator.seedData().catchError((e) => print('Seed data error: $e'));
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
 
-  runApp(const SmartEMenuApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: const SmartEMenuApp(),
+    ),
+  );
 }
 
 class SmartEMenuApp extends StatelessWidget {
@@ -35,13 +45,13 @@ class SmartEMenuApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: AppColors.primary,
         scaffoldBackgroundColor: AppColors.background,
-        fontFamily: 'Playfair Display', // Font chữ sang trọng Indochine
+        fontFamily: 'Playfair Display',
         textTheme: const TextTheme(
           displayLarge: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
           bodyLarge: TextStyle(color: AppColors.text),
         ),
       ),
-      home: const WelcomeScreen(),
+      home: const LoginScreen(),
     );
   }
 }
