@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../auth/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/order.dart';
@@ -109,20 +111,30 @@ class _ChefDashboardState extends State<ChefDashboard> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/'); 
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.clear();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
             },
           ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        // Lấy tất cả các order pending (đang làm) sắp xếp cũ nhất lên đầu
+        // Lấy tất cả các order pending (đánh index tuỳ chỉnh thường bị lỗi nếu không tạo trên Firebase, nên ta bỏ orderBy và sort bằng Dart)
         stream: FirebaseFirestore.instance
             .collection('orders')
             .where('status', isEqualTo: 'pending')
-            .orderBy('createdAt', descending: false)
             .snapshots(),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Lỗi: ${snapshot.error}'));
+          }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -141,6 +153,9 @@ class _ChefDashboardState extends State<ChefDashboard> {
           }
 
           final allOrders = snapshot.data!.docs.map((doc) => OrderModel.fromMap(doc.id, doc.data() as Map<String, dynamic>)).toList();
+          
+          // Sort bằng Dart thay vì orderBy của Firebase để tránh lỗi thiếu Composite Index
+          allOrders.sort((a, b) => a.createdAt.compareTo(b.createdAt));
           
           final queueItems = _processQueue(allOrders);
 

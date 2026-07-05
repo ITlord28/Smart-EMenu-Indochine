@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../auth/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/table_model.dart';
@@ -18,25 +20,65 @@ class CashierDashboard extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              // TODO: Log out logic
-              Navigator.pushReplacementNamed(context, '/'); // Assumes we can restart app or go to login
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.clear();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
             },
           ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('tables').orderBy('id').snapshots(),
+        stream: FirebaseFirestore.instance.collection('tables').snapshots(),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Lỗi: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+          }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('Chưa có dữ liệu bàn.'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Chưa có dữ liệu bàn.', style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        await FirebaseFirestore.instance.collection('tables').get().then((snap) {
+                          for (var doc in snap.docs) doc.reference.delete();
+                        });
+                        for (String area in ['A', 'B', 'C']) {
+                          for (int i = 1; i <= 10; i++) {
+                            String id = '$area${i.toString().padLeft(2, '0')}';
+                            final table = TableModel(id: id, area: area, number: i);
+                            await FirebaseFirestore.instance.collection('tables').doc(id).set(table.toMap());
+                          }
+                        }
+                      } catch (e) {
+                        debugPrint('Lỗi tạo bàn: $e');
+                      }
+                    },
+                    child: const Text('Tạo lại 30 Bàn'),
+                  ),
+                ],
+              ),
+            );
           }
 
           final tables = snapshot.data!.docs.map((doc) => TableModel.fromMap(doc.id, doc.data() as Map<String, dynamic>)).toList();
+          
+          // Sort in memory to avoid missing index
+          tables.sort((a, b) => a.id.compareTo(b.id));
 
           // Group by Area
           final areaA = tables.where((t) => t.area == 'A').toList();

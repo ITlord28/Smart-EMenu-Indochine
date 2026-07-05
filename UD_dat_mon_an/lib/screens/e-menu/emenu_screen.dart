@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../auth/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
@@ -263,6 +265,22 @@ class _EMenuScreenState extends State<EMenuScreen> {
                     borderRadius: BorderRadius.circular(10)),
                 elevation: 2,
               ),
+            ),
+            const SizedBox(width: 16),
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.grey),
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+                if (context.mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                }
+              },
+              tooltip: 'Đăng xuất',
             ),
           ],
         ),

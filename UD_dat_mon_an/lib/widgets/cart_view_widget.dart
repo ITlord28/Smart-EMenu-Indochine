@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/cart_provider.dart';
@@ -255,6 +256,18 @@ class _CartViewWidgetState extends State<CartViewWidget> {
 
     final repo = OrderRepository();
     final success = await repo.placeOrder(order);
+
+    if (success) {
+      // ── MỚI: Tự động đổi trạng thái bàn thành "Có khách" (occupied) ──
+      try {
+        await FirebaseFirestore.instance.collection('tables').doc(widget.tableInfo).update({
+          'status': 'occupied',
+          'entryTime': FieldValue.serverTimestamp(),
+        });
+      } catch (e) {
+        debugPrint('Lỗi cập nhật trạng thái bàn: $e');
+      }
+    }
 
     setState(() {
       _isOrdering = false;

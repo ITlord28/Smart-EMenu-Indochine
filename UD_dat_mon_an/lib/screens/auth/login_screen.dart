@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/constants/app_colors.dart';
 import '../e-menu/emenu_screen.dart';
@@ -59,6 +60,11 @@ class _LoginScreenState extends State<LoginScreen> {
       // Đăng nhập thành công, phân luồng theo role
       final role = data['role'] as String;
       
+      // Save to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userId', id);
+      await prefs.setString('role', role);
+
       if (!mounted) return;
 
       Widget targetScreen;

@@ -122,14 +122,19 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
             .collection('orders')
             .where('tableInfo', isEqualTo: widget.table.id)
             .where('status', isEqualTo: 'pending')
-            .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Lỗi tải dữ liệu: ${snapshot.error}'));
+          }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
           final orders = snapshot.data?.docs.map((doc) => OrderModel.fromMap(doc.id, doc.data() as Map<String, dynamic>)).toList() ?? [];
+          
+          // Sort in memory to avoid missing index issue
+          orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
           double grandTotal = 0;
           for (var o in orders) {

@@ -9,6 +9,12 @@ import 'core/utils/dummy_data_generator.dart';
 import 'package:provider/provider.dart';
 import 'providers/cart_provider.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'screens/e-menu/emenu_screen.dart';
+import 'screens/cashier/cashier_dashboard.dart';
+import 'screens/chef/chef_dashboard.dart';
+import 'screens/manager/manager_dashboard.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -19,26 +25,57 @@ void main() async {
   // Gọi hàm seedData (chạy nền, không block UI)
   DummyDataGenerator.seedData().catchError((e) => print('Seed data error: $e'));
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
+  try {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  } catch (e) {
+    debugPrint('Lỗi xoay màn hình (thường gặp trên iPad Simulator): $e');
+  }
+
+  // Đọc SharedPreferences để auto-login
+  final prefs = await SharedPreferences.getInstance();
+  final role = prefs.getString('role');
+  final userId = prefs.getString('userId');
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
-      child: const SmartEMenuApp(),
+      child: SmartEMenuApp(initialRole: role, initialUserId: userId),
     ),
   );
 }
 
 class SmartEMenuApp extends StatelessWidget {
-  const SmartEMenuApp({super.key});
+  final String? initialRole;
+  final String? initialUserId;
+
+  const SmartEMenuApp({super.key, this.initialRole, this.initialUserId});
 
   @override
   Widget build(BuildContext context) {
+    Widget homeScreen = const LoginScreen();
+    
+    if (initialRole != null && initialUserId != null) {
+      switch (initialRole) {
+        case 'customer':
+          homeScreen = EMenuScreen(tableInfo: initialUserId!);
+          break;
+        case 'cashier':
+          homeScreen = const CashierDashboard();
+          break;
+        case 'chef':
+          homeScreen = const ChefDashboard();
+          break;
+        case 'manager':
+          homeScreen = const ManagerDashboard();
+          break;
+      }
+    }
+
     return MaterialApp(
       title: 'Smart E-Menu Indochine',
       debugShowCheckedModeBanner: false,
@@ -51,7 +88,7 @@ class SmartEMenuApp extends StatelessWidget {
           bodyLarge: TextStyle(color: AppColors.text),
         ),
       ),
-      home: const LoginScreen(),
+      home: homeScreen,
     );
   }
 }
