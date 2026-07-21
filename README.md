@@ -15,20 +15,20 @@
 
 ```mermaid
 graph TD
-    subgraph Client Layer (Flutter App - Tablet/Landscape UI)
+    subgraph ClientLayer ["Client Layer (Flutter App - Tablet/Landscape UI)"]
         EMenu["📱 Client E-Menu<br/>(Menu điện tử & Đặt món)"]
         KDS["👨‍🍳 Kitchen Display System (KDS)<br/>(Phân khu bếp nóng/lạnh/pha chế)"]
         Cashier["💵 Cashier Dashboard<br/>(Sơ đồ bàn & Xuất hóa đơn PDF)"]
         Manager["📊 Manager Dashboard<br/>(Biểu đồ doanh thu fl_chart & Menu CRUD)"]
     end
 
-    subgraph Business Logic & State Architecture
+    subgraph BusinessLogic ["Business Logic & State Architecture"]
         CartProv["CartProvider<br/>(Quản lý giỏ hàng & tính tiền)"]
         OrderRepo["OrderRepository<br/>(Firestore Data Access Layer)"]
         PDFEngine["PDFInvoiceHelper<br/>(Tự động tạo & in hóa đơn PDF)"]
     end
 
-    subgraph Cloud Infrastructure (Firebase Backend)
+    subgraph CloudInfra ["Cloud Infrastructure (Firebase Backend)"]
         Firestore[("🔥 Cloud Firestore<br/>(Realtime DB Collections)")]
     end
 
