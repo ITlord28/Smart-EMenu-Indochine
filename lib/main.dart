@@ -55,7 +55,8 @@ class SmartEMenuApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.background,
         fontFamily: 'Playfair Display',
         textTheme: const TextTheme(
-          displayLarge: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
+          displayLarge:
+              TextStyle(color: AppColors.text, fontWeight: FontWeight.bold),
           bodyLarge: TextStyle(color: AppColors.text),
         ),
       ),

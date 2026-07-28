@@ -144,7 +144,8 @@ class _DetailView extends StatelessWidget {
                   return Container(
                     color: Colors.grey.shade100,
                     child: const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
+                      child:
+                          CircularProgressIndicator(color: AppColors.primary),
                     ),
                   );
                 },
@@ -278,7 +279,8 @@ class _DetailView extends StatelessWidget {
                       ),
                       selected: false,
                       onSelected: (_) {},
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.07),
+                      backgroundColor:
+                          AppColors.primary.withValues(alpha: 0.07),
                       side: const BorderSide(
                           color: AppColors.primary, width: 0.8),
                       shape: RoundedRectangleBorder(

@@ -8,7 +8,7 @@ class OrderRepository {
   Future<bool> placeOrder(OrderModel order) async {
     try {
       await _firestore.collection(_collectionPath).add(order.toMap());
-      
+
       final normalizedId = order.tableInfo.replaceAll('-', '');
       final tableRef = _firestore.collection('tables').doc(normalizedId);
       final doc = await tableRef.get();
@@ -39,14 +39,13 @@ class OrderRepository {
           'entryTime': FieldValue.serverTimestamp(),
         });
       }
-      
+
       return true;
     } catch (e) {
       print('Error placing order: $e');
       return false;
     }
   }
-
 
   Stream<List<OrderModel>> watchActiveOrders(String tableInfo) {
     final normalizedId = tableInfo.replaceAll('-', '');
@@ -56,7 +55,9 @@ class OrderRepository {
         .where('status', isEqualTo: 'pending')
         .snapshots()
         .map((snapshot) {
-      final list = snapshot.docs.map((doc) => OrderModel.fromMap(doc.id, doc.data())).toList();
+      final list = snapshot.docs
+          .map((doc) => OrderModel.fromMap(doc.id, doc.data()))
+          .toList();
       list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return list;
     });

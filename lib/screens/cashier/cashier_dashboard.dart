@@ -18,10 +18,12 @@ class CashierDashboard extends StatefulWidget {
 }
 
 class _CashierDashboardState extends State<CashierDashboard> {
-  int _selectedIndex = 0; // Trạng thái tab đang chọn (0: Quản lý Bàn, 1: Quản lý Hóa đơn)
+  int _selectedIndex =
+      0; // Trạng thái tab đang chọn (0: Quản lý Bàn, 1: Quản lý Hóa đơn)
 
   /// Xây dựng lưới danh sách bàn ăn theo từng phân khu
-  Widget _buildTableGridSection(List<TableModel> tables, Set<String> occupiedTableIds) {
+  Widget _buildTableGridSection(
+      List<TableModel> tables, Set<String> occupiedTableIds) {
     final areaA = tables.where((t) => t.area == 'A').toList();
     final areaB = tables.where((t) => t.area == 'B').toList();
     final areaC = tables.where((t) => t.area == 'C').toList();
@@ -39,7 +41,8 @@ class _CashierDashboardState extends State<CashierDashboard> {
   }
 
   /// Xây dựng tiêu đề khu vực kèm Grid lưới bàn tương ứng
-  Widget _buildAreaSection(String title, List<TableModel> tables, Set<String> occupiedTableIds) {
+  Widget _buildAreaSection(
+      String title, List<TableModel> tables, Set<String> occupiedTableIds) {
     if (tables.isEmpty) return const SizedBox();
 
     return Column(
@@ -47,7 +50,10 @@ class _CashierDashboardState extends State<CashierDashboard> {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primary),
+          style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary),
         ),
         const SizedBox(height: 16),
         GridView.builder(
@@ -76,7 +82,8 @@ class _CashierDashboardState extends State<CashierDashboard> {
     String statusText;
 
     // Determine status: if there are unpaid orders, mark as occupied
-    final bool hasPendingOrders = occupiedTableIds.contains(table.id.replaceAll('-', ''));
+    final bool hasPendingOrders =
+        occupiedTableIds.contains(table.id.replaceAll('-', ''));
     final String currentStatus = hasPendingOrders ? 'occupied' : table.status;
 
     // Phân loại màu sắc thẻ bàn theo trạng thái:
@@ -129,7 +136,8 @@ class _CashierDashboardState extends State<CashierDashboard> {
           children: [
             Text(
               table.id,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: textColor),
+              style: TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.bold, color: textColor),
             ),
             const SizedBox(height: 8),
             Text(
@@ -140,7 +148,8 @@ class _CashierDashboardState extends State<CashierDashboard> {
             if (currentStatus == 'occupied' && table.entryTime != null)
               Text(
                 'Vào: ${table.entryTime!.hour}:${table.entryTime!.minute.toString().padLeft(2, '0')}',
-                style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.8)),
+                style: TextStyle(
+                    fontSize: 12, color: textColor.withValues(alpha: 0.8)),
               ),
           ],
         ),
@@ -157,7 +166,8 @@ class _CashierDashboardState extends State<CashierDashboard> {
         final List<TableModel> tables = [];
         if (tablesSnapshot.hasData) {
           for (var doc in tablesSnapshot.data!.docs) {
-            tables.add(TableModel.fromMap(doc.id, doc.data() as Map<String, dynamic>));
+            tables.add(
+                TableModel.fromMap(doc.id, doc.data() as Map<String, dynamic>));
           }
           tables.sort((a, b) => a.id.compareTo(b.id));
         }
@@ -183,7 +193,10 @@ class _CashierDashboardState extends State<CashierDashboard> {
             return Scaffold(
               backgroundColor: AppColors.background,
               appBar: AppBar(
-                title: const Text('Quầy Thu Ngân & Điều Phối Bàn Ăn', style: TextStyle(fontFamily: 'Playfair Display', fontWeight: FontWeight.bold)),
+                title: const Text('Quầy Thu Ngân & Điều Phối Bàn Ăn',
+                    style: TextStyle(
+                        fontFamily: 'Playfair Display',
+                        fontWeight: FontWeight.bold)),
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 actions: [
@@ -194,7 +207,9 @@ class _CashierDashboardState extends State<CashierDashboard> {
                     onPressed: () {
                       setState(() {});
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Đã cập nhật dữ liệu bàn mới nhất.'), duration: Duration(milliseconds: 850)),
+                        const SnackBar(
+                            content: Text('Đã cập nhật dữ liệu bàn mới nhất.'),
+                            duration: Duration(milliseconds: 850)),
                       );
                     },
                   ),
@@ -202,7 +217,7 @@ class _CashierDashboardState extends State<CashierDashboard> {
                     icon: const Icon(Icons.logout),
                     tooltip: 'Đăng xuất',
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/'); 
+                      Navigator.pushReplacementNamed(context, '/');
                     },
                   ),
                 ],
@@ -216,16 +231,19 @@ class _CashierDashboardState extends State<CashierDashboard> {
                     child: Column(
                       children: [
                         const SizedBox(height: 32),
-                        const Icon(Icons.point_of_sale, size: 80, color: AppColors.primary),
+                        const Icon(Icons.point_of_sale,
+                            size: 80, color: AppColors.primary),
                         const SizedBox(height: 16),
-                        const Text('Quầy Thu Ngân', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        const Text('Quầy Thu Ngân',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 32),
-                        
                         ListTile(
                           leading: const Icon(Icons.table_restaurant),
                           title: const Text('Quản lý Bàn'),
                           selected: _selectedIndex == 0,
-                          selectedTileColor: AppColors.primary.withValues(alpha: 0.1),
+                          selectedTileColor:
+                              AppColors.primary.withValues(alpha: 0.1),
                           selectedColor: AppColors.primary,
                           onTap: () => setState(() => _selectedIndex = 0),
                         ),
@@ -233,23 +251,29 @@ class _CashierDashboardState extends State<CashierDashboard> {
                           leading: const Icon(Icons.receipt_long),
                           title: const Text('Quản lý Hóa đơn'),
                           selected: _selectedIndex == 1,
-                          selectedTileColor: AppColors.primary.withValues(alpha: 0.1),
+                          selectedTileColor:
+                              AppColors.primary.withValues(alpha: 0.1),
                           selectedColor: AppColors.primary,
                           onTap: () => setState(() => _selectedIndex = 1),
                         ),
                       ],
                     ),
                   ),
-                  
+
                   // 2. Vùng hiển thị nội dung bên phải (Right Content Workspace)
                   Expanded(
                     child: _selectedIndex == 1
-                        ? const CashierHistoryScreen(embedMode: true) // Nhúng màn hình lịch sử hóa đơn ở chế độ không appBar
-                        : tablesSnapshot.connectionState == ConnectionState.waiting
+                        ? const CashierHistoryScreen(
+                            embedMode:
+                                true) // Nhúng màn hình lịch sử hóa đơn ở chế độ không appBar
+                        : tablesSnapshot.connectionState ==
+                                ConnectionState.waiting
                             ? const Center(child: CircularProgressIndicator())
                             : tables.isEmpty
-                                ? const Center(child: Text('Chưa có dữ liệu bàn.'))
-                                : _buildTableGridSection(tables, occupiedTableIds),
+                                ? const Center(
+                                    child: Text('Chưa có dữ liệu bàn.'))
+                                : _buildTableGridSection(
+                                    tables, occupiedTableIds),
                   ),
                 ],
               ),

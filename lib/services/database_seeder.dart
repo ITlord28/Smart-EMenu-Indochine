@@ -314,15 +314,41 @@ class DatabaseSeeder {
       // 3. Seed 'categories' collection with correct IDs and display names
       final categorySpecs = [
         {"id": "cat_lau", "name": "Nước Lẩu", "sort_order": 1, "icon": "soup"},
-        {"id": "cat_nhung", "name": "Đồ Nhúng Lẩu", "sort_order": 2, "icon": "beef"},
-        {"id": "cat_khaivi", "name": "Món Khai Vị", "sort_order": 3, "icon": "utensils"},
-        {"id": "cat_cuon", "name": "Món Cuốn", "sort_order": 4, "icon": "utensils"},
-        {"id": "cat_trangmieng", "name": "Món Tráng Miệng", "sort_order": 5, "icon": "ice-cream"},
-        {"id": "cat_douong", "name": "Đồ Uống", "sort_order": 6, "icon": "cup-soda"},
+        {
+          "id": "cat_nhung",
+          "name": "Đồ Nhúng Lẩu",
+          "sort_order": 2,
+          "icon": "beef"
+        },
+        {
+          "id": "cat_khaivi",
+          "name": "Món Khai Vị",
+          "sort_order": 3,
+          "icon": "utensils"
+        },
+        {
+          "id": "cat_cuon",
+          "name": "Món Cuốn",
+          "sort_order": 4,
+          "icon": "utensils"
+        },
+        {
+          "id": "cat_trangmieng",
+          "name": "Món Tráng Miệng",
+          "sort_order": 5,
+          "icon": "ice-cream"
+        },
+        {
+          "id": "cat_douong",
+          "name": "Đồ Uống",
+          "sort_order": 6,
+          "icon": "cup-soda"
+        },
       ];
 
       for (var spec in categorySpecs) {
-        final categoryRef = _db.collection('categories').doc(spec['id'] as String);
+        final categoryRef =
+            _db.collection('categories').doc(spec['id'] as String);
         batch.set(categoryRef, {
           'name': spec['name'],
           'sort_order': spec['sort_order'],

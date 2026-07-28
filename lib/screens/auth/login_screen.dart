@@ -45,7 +45,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       // Truy xuất tài khoản người dùng từ collection 'users' bằng ID tài khoản làm key chính
-      final doc = await FirebaseFirestore.instance.collection('users').doc(id).get();
+      final doc =
+          await FirebaseFirestore.instance.collection('users').doc(id).get();
 
       if (!doc.exists) {
         setState(() {
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Lấy vai trò (role) từ tài khoản để chuyển hướng màn hình làm việc tương ứng
       final role = data['role'] as String;
-      
+
       if (!mounted) return;
 
       Widget targetScreen;
@@ -100,7 +101,6 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(builder: (_) => targetScreen),
       );
-
     } catch (e) {
       setState(() {
         _errorMessage = 'Không thể kết nối đến máy chủ Firestore: $e';
@@ -131,7 +131,8 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.restaurant_menu, size: 80, color: AppColors.primary),
+              const Icon(Icons.restaurant_menu,
+                  size: 80, color: AppColors.primary),
               const SizedBox(height: 16),
               const Text(
                 'HỆ THỐNG VẬN HÀNH',
@@ -149,14 +150,17 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 32),
               if (_errorMessage.isNotEmpty) ...[
-                Text(_errorMessage, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                Text(_errorMessage,
+                    style: const TextStyle(
+                        color: Colors.red, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
               ],
               TextField(
                 controller: _idController,
                 decoration: InputDecoration(
                   labelText: 'Tài khoản',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8)),
                   prefixIcon: const Icon(Icons.person),
                 ),
               ),
@@ -166,7 +170,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Mật khẩu',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8)),
                   prefixIcon: const Icon(Icons.lock),
                 ),
               ),
@@ -179,11 +184,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('ĐĂNG NHẬP', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      : const Text('ĐĂNG NHẬP',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],

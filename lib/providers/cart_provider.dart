@@ -8,7 +8,7 @@ class CartProvider with ChangeNotifier {
   Map<String, CartItem> get items => {..._items};
 
   int get itemCount => _items.length;
-  
+
   int get totalQuantity {
     int total = 0;
     _items.forEach((key, cartItem) {

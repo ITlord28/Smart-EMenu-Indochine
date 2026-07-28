@@ -53,11 +53,13 @@ class _CartViewWidgetState extends State<CartViewWidget> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.remove_shopping_cart_outlined, size: 80, color: Colors.grey[300]),
+                        Icon(Icons.remove_shopping_cart_outlined,
+                            size: 80, color: Colors.grey[300]),
                         const SizedBox(height: 16),
                         Text(
                           'Giỏ hàng đang trống',
-                          style: TextStyle(color: Colors.grey[500], fontSize: 20),
+                          style:
+                              TextStyle(color: Colors.grey[500], fontSize: 20),
                         ),
                       ],
                     ),
@@ -70,7 +72,8 @@ class _CartViewWidgetState extends State<CartViewWidget> {
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         elevation: 2,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Row(
@@ -87,7 +90,8 @@ class _CartViewWidgetState extends State<CartViewWidget> {
                                     width: 80,
                                     height: 80,
                                     color: Colors.grey.shade200,
-                                    child: const Icon(Icons.image_not_supported, size: 30, color: Colors.grey),
+                                    child: const Icon(Icons.image_not_supported,
+                                        size: 30, color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -135,7 +139,8 @@ class _CartViewWidgetState extends State<CartViewWidget> {
                                       icon: const Icon(Icons.remove),
                                       color: Colors.grey[700],
                                       onPressed: () {
-                                        cart.updateQuantity(itemKey, cartItem.quantity - 1);
+                                        cart.updateQuantity(
+                                            itemKey, cartItem.quantity - 1);
                                       },
                                     ),
                                     SizedBox(
@@ -143,14 +148,17 @@ class _CartViewWidgetState extends State<CartViewWidget> {
                                       child: Text(
                                         '${cartItem.quantity}',
                                         textAlign: TextAlign.center,
-                                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                     IconButton(
                                       icon: const Icon(Icons.add),
                                       color: AppColors.primary,
                                       onPressed: () {
-                                        cart.updateQuantity(itemKey, cartItem.quantity + 1);
+                                        cart.updateQuantity(
+                                            itemKey, cartItem.quantity + 1);
                                       },
                                     ),
                                   ],
@@ -274,7 +282,8 @@ class _CartViewWidgetState extends State<CartViewWidget> {
               ],
             ),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             margin: const EdgeInsets.all(20),
           ),
         );
@@ -286,7 +295,8 @@ class _CartViewWidgetState extends State<CartViewWidget> {
             backgroundColor: Colors.red,
             content: const Text('Có lỗi xảy ra khi đặt món. Vui lòng thử lại.'),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             margin: const EdgeInsets.all(20),
           ),
         );

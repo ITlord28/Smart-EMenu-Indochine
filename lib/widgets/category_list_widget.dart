@@ -44,7 +44,8 @@ class CategoryListWidget extends StatelessWidget {
             ),
             child: const Column(
               children: [
-                Icon(Icons.restaurant_menu, color: AppColors.secondary, size: 32),
+                Icon(Icons.restaurant_menu,
+                    color: AppColors.secondary, size: 32),
                 SizedBox(height: 6),
                 Text(
                   'THỰC ĐƠN',
@@ -66,8 +67,8 @@ class CategoryListWidget extends StatelessWidget {
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: categories.length,
-              separatorBuilder: (_, __) =>
-                  const Divider(color: Colors.white12, height: 1, indent: 16, endIndent: 16),
+              separatorBuilder: (_, __) => const Divider(
+                  color: Colors.white12, height: 1, indent: 16, endIndent: 16),
               itemBuilder: (context, index) {
                 final category = categories[index];
                 final bool isSelected = category.id == selectedCategoryId;
@@ -138,7 +139,8 @@ class _CategoryTile extends StatelessWidget {
                   category.name,
                   style: TextStyle(
                     color: isSelected ? AppColors.secondary : Colors.white70,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                     fontSize: 13,
                     height: 1.4,
                   ),

@@ -40,7 +40,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
     return total;
   }
 
-  void _calculateWeeklyRevenue(List<QueryDocumentSnapshot> invoices, List<double> thisMonthWeeks, List<double> lastMonthWeeks) {
+  void _calculateWeeklyRevenue(List<QueryDocumentSnapshot> invoices,
+      List<double> thisMonthWeeks, List<double> lastMonthWeeks) {
     final now = DateTime.now();
     final currentMonth = now.month;
     final currentYear = now.year;
@@ -53,15 +54,19 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
       final data = doc.data() as Map<String, dynamic>;
       final createdAtField = data['createdAt'];
       if (createdAtField == null) continue;
-      
+
       final DateTime date = (createdAtField as Timestamp).toDate();
       final double grandTotal = (data['grandTotal'] as num?)?.toDouble() ?? 0.0;
-      
+
       int weekIdx = 0;
-      if (date.day <= 7) weekIdx = 0;
-      else if (date.day <= 14) weekIdx = 1;
-      else if (date.day <= 21) weekIdx = 2;
-      else weekIdx = 3;
+      if (date.day <= 7)
+        weekIdx = 0;
+      else if (date.day <= 14)
+        weekIdx = 1;
+      else if (date.day <= 21)
+        weekIdx = 2;
+      else
+        weekIdx = 3;
 
       if (date.month == currentMonth && date.year == currentYear) {
         thisMonthWeeks[weekIdx] += grandTotal;
@@ -71,7 +76,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
     }
   }
 
-  void _calculateDailyRevenue7Days(List<QueryDocumentSnapshot> invoices, List<double> thisMonthDays, List<double> lastMonthDays) {
+  void _calculateDailyRevenue7Days(List<QueryDocumentSnapshot> invoices,
+      List<double> thisMonthDays, List<double> lastMonthDays) {
     final now = DateTime.now();
     final currentMonth = now.month;
     final currentYear = now.year;
@@ -84,10 +90,10 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
       final data = doc.data() as Map<String, dynamic>;
       final createdAtField = data['createdAt'];
       if (createdAtField == null) continue;
-      
+
       final DateTime date = (createdAtField as Timestamp).toDate();
       final double grandTotal = (data['grandTotal'] as num?)?.toDouble() ?? 0.0;
-      
+
       if (date.day >= 1 && date.day <= 7) {
         int dayIdx = date.day - 1;
         if (date.month == currentMonth && date.year == currentYear) {
@@ -120,8 +126,11 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Thêm bàn ăn mới', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              title: const Text('Thêm bàn ăn mới',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: AppColors.primary)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -137,7 +146,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                     value: _newTableArea,
                     decoration: const InputDecoration(labelText: 'Khu vực'),
                     items: ['A', 'B', 'C'].map((area) {
-                      return DropdownMenuItem(value: area, child: Text('Khu vực $area'));
+                      return DropdownMenuItem(
+                          value: area, child: Text('Khu vực $area'));
                     }).toList(),
                     onChanged: (val) {
                       if (val != null) {
@@ -161,22 +171,30 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+                  child:
+                      const Text('Hủy', style: TextStyle(color: Colors.grey)),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white),
                   onPressed: () async {
                     final id = _tableIdCtrl.text.trim().toUpperCase();
-                    final numVal = int.tryParse(_tableNumberCtrl.text.trim()) ?? 0;
+                    final numVal =
+                        int.tryParse(_tableNumberCtrl.text.trim()) ?? 0;
 
                     if (id.isEmpty || numVal <= 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Vui lòng nhập thông tin hợp lệ.')),
+                        const SnackBar(
+                            content: Text('Vui lòng nhập thông tin hợp lệ.')),
                       );
                       return;
                     }
 
-                    final doc = await FirebaseFirestore.instance.collection('tables').doc(id).get();
+                    final doc = await FirebaseFirestore.instance
+                        .collection('tables')
+                        .doc(id)
+                        .get();
                     if (doc.exists) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -193,7 +211,10 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                       status: 'empty',
                     );
 
-                    await FirebaseFirestore.instance.collection('tables').doc(id).set(newTable.toMap());
+                    await FirebaseFirestore.instance
+                        .collection('tables')
+                        .doc(id)
+                        .set(newTable.toMap());
                     if (context.mounted) {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -217,9 +238,12 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Không thể thay đổi', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-          content: Text('Bàn ${table.id} đang ${table.status == 'occupied' ? 'có khách' : 'được đặt trước'}. Quản lý không thể trực tiếp thay đổi trạng thái này.'),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Không thể thay đổi',
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text(
+              'Bàn ${table.id} đang ${table.status == 'occupied' ? 'có khách' : 'được đặt trước'}. Quản lý không thể trực tiếp thay đổi trạng thái này.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -233,7 +257,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
     // Chỉ cho phép khóa (empty -> locked) hoặc mở khóa (locked -> empty)
     final isCurrentlyLocked = table.status == 'locked';
-    final title = isCurrentlyLocked ? 'Mở khóa bàn ${table.id}' : 'Khóa bàn ${table.id}';
+    final title =
+        isCurrentlyLocked ? 'Mở khóa bàn ${table.id}' : 'Khóa bàn ${table.id}';
     final content = isCurrentlyLocked
         ? 'Bạn có chắc chắn muốn mở khóa bàn ${table.id}? Bàn sẽ trở lại trạng thái Trống.'
         : 'Bạn có chắc chắn muốn khóa bàn ${table.id}? Khách hàng và thu ngân sẽ không thể tương tác với bàn này.';
@@ -243,8 +268,11 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: AppColors.primary)),
           content: Text(content),
           actions: [
             TextButton(
@@ -253,19 +281,25 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: isCurrentlyLocked ? Colors.green : AppColors.primary,
+                backgroundColor:
+                    isCurrentlyLocked ? Colors.green : AppColors.primary,
                 foregroundColor: Colors.white,
               ),
               onPressed: () async {
                 final newStatus = isCurrentlyLocked ? 'empty' : 'locked';
-                await FirebaseFirestore.instance.collection('tables').doc(table.id).update({
+                await FirebaseFirestore.instance
+                    .collection('tables')
+                    .doc(table.id)
+                    .update({
                   'status': newStatus,
                   'entryTime': null,
                 });
                 if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Đã cập nhật trạng thái bàn ${table.id}')),
+                    SnackBar(
+                        content:
+                            Text('Đã cập nhật trạng thái bàn ${table.id}')),
                   );
                 }
               },
@@ -282,11 +316,15 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Xác nhận xóa bàn'),
-        content: Text('Bạn có chắc chắn muốn xóa bàn ${table.id} khỏi hệ thống?'),
+        content:
+            Text('Bạn có chắc chắn muốn xóa bàn ${table.id} khỏi hệ thống?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Hủy', style: TextStyle(color: Colors.grey))),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Hủy', style: TextStyle(color: Colors.grey))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, foregroundColor: Colors.white),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Xóa'),
           ),
@@ -295,7 +333,10 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
     );
 
     if (confirm == true) {
-      await FirebaseFirestore.instance.collection('tables').doc(table.id).delete();
+      await FirebaseFirestore.instance
+          .collection('tables')
+          .doc(table.id)
+          .delete();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Đã xóa bàn ${table.id}')),
@@ -307,7 +348,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
   // ═══════════════════════════════════════════════
   //  EXPORT MONTHLY REPORT PDF METHOD
   // ═══════════════════════════════════════════════
-  Future<void> _exportMonthlyReport(List<QueryDocumentSnapshot> invoices, int month, int year) async {
+  Future<void> _exportMonthlyReport(
+      List<QueryDocumentSnapshot> invoices, int month, int year) async {
     final monthlyInvoices = invoices.where((doc) {
       final createdAtField = doc['createdAt'];
       if (createdAtField == null) return false;
@@ -317,7 +359,9 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
 
     if (monthlyInvoices.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không có dữ liệu hóa đơn nào cho Tháng $month/$year.')),
+        SnackBar(
+            content:
+                Text('Không có dữ liệu hóa đơn nào cho Tháng $month/$year.')),
       );
       return;
     }
@@ -356,7 +400,9 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
       }
     }
 
-    final double avgValue = monthlyInvoices.isNotEmpty ? totalRevenue / monthlyInvoices.length : 0.0;
+    final double avgValue = monthlyInvoices.isNotEmpty
+        ? totalRevenue / monthlyInvoices.length
+        : 0.0;
 
     final sortedDishes = dishQuantities.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
@@ -376,121 +422,204 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Center(
-                  child: pw.Text('SEN VÀNG FOOD', style: pw.TextStyle(font: fontBold, fontSize: 24, color: PdfColors.amber800)),
+                  child: pw.Text('SEN VÀNG FOOD',
+                      style: pw.TextStyle(
+                          font: fontBold,
+                          fontSize: 24,
+                          color: PdfColors.amber800)),
                 ),
                 pw.Center(
-                  child: pw.Text('BÁO CÁO DOANH THU THÁNG $month/$year', style: pw.TextStyle(font: fontBold, fontSize: 18)),
+                  child: pw.Text('BÁO CÁO DOANH THU THÁNG $month/$year',
+                      style: pw.TextStyle(font: fontBold, fontSize: 18)),
                 ),
                 pw.SizedBox(height: 8),
                 pw.Center(
-                  child: pw.Text('Ngày lập báo cáo: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}', style: pw.TextStyle(font: font, fontSize: 11, color: PdfColors.grey600)),
+                  child: pw.Text(
+                      'Ngày lập báo cáo: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}',
+                      style: pw.TextStyle(
+                          font: font, fontSize: 11, color: PdfColors.grey600)),
                 ),
                 pw.Divider(height: 24),
-
-                pw.Text('I. TÓM TẮT CHỈ SỐ DOANH THU', style: pw.TextStyle(font: fontBold, fontSize: 14)),
+                pw.Text('I. TÓM TẮT CHỈ SỐ DOANH THU',
+                    style: pw.TextStyle(font: fontBold, fontSize: 14)),
                 pw.SizedBox(height: 12),
                 pw.Table(
-                  border: pw.TableBorder.all(color: PdfColors.grey300),
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Chỉ số', style: pw.TextStyle(font: fontBold))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Giá trị', style: pw.TextStyle(font: fontBold), textAlign: pw.TextAlign.right)),
-                      ]
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Tổng doanh thu', style: pw.TextStyle(font: font))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text(_formatPrice(totalRevenue.toInt()), style: pw.TextStyle(font: fontBold, color: PdfColors.green800), textAlign: pw.TextAlign.right)),
-                      ]
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Tổng số lượng đơn', style: pw.TextStyle(font: font))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('${monthlyInvoices.length} đơn', style: pw.TextStyle(font: font), textAlign: pw.TextAlign.right)),
-                      ]
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Giá trị trung bình đơn', style: pw.TextStyle(font: font))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text(_formatPrice(avgValue.toInt()), style: pw.TextStyle(font: font), textAlign: pw.TextAlign.right)),
-                      ]
-                    ),
-                  ]
-                ),
+                    border: pw.TableBorder.all(color: PdfColors.grey300),
+                    children: [
+                      pw.TableRow(children: [
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Chỉ số',
+                                style: pw.TextStyle(font: fontBold))),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Giá trị',
+                                style: pw.TextStyle(font: fontBold),
+                                textAlign: pw.TextAlign.right)),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Tổng doanh thu',
+                                style: pw.TextStyle(font: font))),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text(_formatPrice(totalRevenue.toInt()),
+                                style: pw.TextStyle(
+                                    font: fontBold, color: PdfColors.green800),
+                                textAlign: pw.TextAlign.right)),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Tổng số lượng đơn',
+                                style: pw.TextStyle(font: font))),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('${monthlyInvoices.length} đơn',
+                                style: pw.TextStyle(font: font),
+                                textAlign: pw.TextAlign.right)),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Giá trị trung bình đơn',
+                                style: pw.TextStyle(font: font))),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text(_formatPrice(avgValue.toInt()),
+                                style: pw.TextStyle(font: font),
+                                textAlign: pw.TextAlign.right)),
+                      ]),
+                    ]),
                 pw.SizedBox(height: 24),
-
-                pw.Text('II. CƠ CẤU DOANH THU THEO HÌNH THỨC THANH TOÁN', style: pw.TextStyle(font: fontBold, fontSize: 14)),
+                pw.Text('II. CƠ CẤU DOANH THU THEO HÌNH THỨC THANH TOÁN',
+                    style: pw.TextStyle(font: fontBold, fontSize: 14)),
                 pw.SizedBox(height: 12),
                 pw.Table(
-                  border: pw.TableBorder.all(color: PdfColors.grey300),
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Hình thức', style: pw.TextStyle(font: fontBold))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Doanh thu', style: pw.TextStyle(font: fontBold), textAlign: pw.TextAlign.right)),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Tỷ lệ %', style: pw.TextStyle(font: fontBold), textAlign: pw.TextAlign.right)),
-                      ]
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Tiền mặt', style: pw.TextStyle(font: font))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text(_formatPrice(cashRevenue.toInt()), style: pw.TextStyle(font: font), textAlign: pw.TextAlign.right)),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('${totalRevenue > 0 ? (cashRevenue / totalRevenue * 100).toStringAsFixed(1) : 0}%', style: pw.TextStyle(font: font), textAlign: pw.TextAlign.right)),
-                      ]
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('MoMo / ZaloPay', style: pw.TextStyle(font: font))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text(_formatPrice(ewalletRevenue.toInt()), style: pw.TextStyle(font: font), textAlign: pw.TextAlign.right)),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('${totalRevenue > 0 ? (ewalletRevenue / totalRevenue * 100).toStringAsFixed(1) : 0}%', style: pw.TextStyle(font: font), textAlign: pw.TextAlign.right)),
-                      ]
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Thẻ Ngân Hàng', style: pw.TextStyle(font: font))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text(_formatPrice(bankRevenue.toInt()), style: pw.TextStyle(font: font), textAlign: pw.TextAlign.right)),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('${totalRevenue > 0 ? (bankRevenue / totalRevenue * 100).toStringAsFixed(1) : 0}%', style: pw.TextStyle(font: font), textAlign: pw.TextAlign.right)),
-                      ]
-                    ),
-                  ]
-                ),
+                    border: pw.TableBorder.all(color: PdfColors.grey300),
+                    children: [
+                      pw.TableRow(children: [
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Hình thức',
+                                style: pw.TextStyle(font: fontBold))),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Doanh thu',
+                                style: pw.TextStyle(font: fontBold),
+                                textAlign: pw.TextAlign.right)),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Tỷ lệ %',
+                                style: pw.TextStyle(font: fontBold),
+                                textAlign: pw.TextAlign.right)),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Tiền mặt',
+                                style: pw.TextStyle(font: font))),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text(_formatPrice(cashRevenue.toInt()),
+                                style: pw.TextStyle(font: font),
+                                textAlign: pw.TextAlign.right)),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text(
+                                '${totalRevenue > 0 ? (cashRevenue / totalRevenue * 100).toStringAsFixed(1) : 0}%',
+                                style: pw.TextStyle(font: font),
+                                textAlign: pw.TextAlign.right)),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('MoMo / ZaloPay',
+                                style: pw.TextStyle(font: font))),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text(_formatPrice(ewalletRevenue.toInt()),
+                                style: pw.TextStyle(font: font),
+                                textAlign: pw.TextAlign.right)),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text(
+                                '${totalRevenue > 0 ? (ewalletRevenue / totalRevenue * 100).toStringAsFixed(1) : 0}%',
+                                style: pw.TextStyle(font: font),
+                                textAlign: pw.TextAlign.right)),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Thẻ Ngân Hàng',
+                                style: pw.TextStyle(font: font))),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text(_formatPrice(bankRevenue.toInt()),
+                                style: pw.TextStyle(font: font),
+                                textAlign: pw.TextAlign.right)),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text(
+                                '${totalRevenue > 0 ? (bankRevenue / totalRevenue * 100).toStringAsFixed(1) : 0}%',
+                                style: pw.TextStyle(font: font),
+                                textAlign: pw.TextAlign.right)),
+                      ]),
+                    ]),
                 pw.SizedBox(height: 24),
-
-                pw.Text('III. TOP 10 MÓN ĂN BÁN CHẠY TRONG THÁNG', style: pw.TextStyle(font: fontBold, fontSize: 14)),
+                pw.Text('III. TOP 10 MÓN ĂN BÁN CHẠY TRONG THÁNG',
+                    style: pw.TextStyle(font: fontBold, fontSize: 14)),
                 pw.SizedBox(height: 12),
                 pw.Table(
-                  border: pw.TableBorder.all(color: PdfColors.grey300),
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('STT', style: pw.TextStyle(font: fontBold), textAlign: pw.TextAlign.center)),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Tên món ăn', style: pw.TextStyle(font: fontBold))),
-                        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('Số lượng', style: pw.TextStyle(font: fontBold), textAlign: pw.TextAlign.right)),
-                      ]
-                    ),
-                    for (int i = 0; i < topDishes.length; i++)
-                      pw.TableRow(
-                        children: [
-                          pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('${i + 1}', style: pw.TextStyle(font: font), textAlign: pw.TextAlign.center)),
-                          pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text(topDishes[i].key, style: pw.TextStyle(font: font))),
-                          pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text('${topDishes[i].value} phần', style: pw.TextStyle(font: fontBold), textAlign: pw.TextAlign.right)),
-                        ]
-                      ),
-                  ]
-                ),
+                    border: pw.TableBorder.all(color: PdfColors.grey300),
+                    children: [
+                      pw.TableRow(children: [
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('STT',
+                                style: pw.TextStyle(font: fontBold),
+                                textAlign: pw.TextAlign.center)),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Tên món ăn',
+                                style: pw.TextStyle(font: fontBold))),
+                        pw.Padding(
+                            padding: const pw.EdgeInsets.all(8),
+                            child: pw.Text('Số lượng',
+                                style: pw.TextStyle(font: fontBold),
+                                textAlign: pw.TextAlign.right)),
+                      ]),
+                      for (int i = 0; i < topDishes.length; i++)
+                        pw.TableRow(children: [
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(8),
+                              child: pw.Text('${i + 1}',
+                                  style: pw.TextStyle(font: font),
+                                  textAlign: pw.TextAlign.center)),
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(8),
+                              child: pw.Text(topDishes[i].key,
+                                  style: pw.TextStyle(font: font))),
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(8),
+                              child: pw.Text('${topDishes[i].value} phần',
+                                  style: pw.TextStyle(font: fontBold),
+                                  textAlign: pw.TextAlign.right)),
+                        ]),
+                    ]),
                 pw.Spacer(),
-
                 pw.Align(
                   alignment: pw.Alignment.bottomRight,
                   child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.center,
-                    children: [
-                      pw.Text('Người lập báo cáo (Ký tên)', style: pw.TextStyle(font: fontBold, fontSize: 12)),
-                      pw.SizedBox(height: 48),
-                      pw.Text('Quản lý hệ thống', style: pw.TextStyle(font: font, fontSize: 12)),
-                    ]
-                  ),
+                      crossAxisAlignment: pw.CrossAxisAlignment.center,
+                      children: [
+                        pw.Text('Người lập báo cáo (Ký tên)',
+                            style: pw.TextStyle(font: fontBold, fontSize: 12)),
+                        pw.SizedBox(height: 48),
+                        pw.Text('Quản lý hệ thống',
+                            style: pw.TextStyle(font: font, fontSize: 12)),
+                      ]),
                 ),
               ],
             ),
@@ -505,7 +634,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
     );
   }
 
-  Future<void> _showSelectMonthReportDialog(List<QueryDocumentSnapshot> invoices) async {
+  Future<void> _showSelectMonthReportDialog(
+      List<QueryDocumentSnapshot> invoices) async {
     int selectedMonth = DateTime.now().month;
     int selectedYear = DateTime.now().year;
 
@@ -515,8 +645,11 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Xuất báo cáo doanh thu tháng', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              title: const Text('Xuất báo cáo doanh thu tháng',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: AppColors.primary)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -524,17 +657,21 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                     value: selectedMonth,
                     decoration: const InputDecoration(labelText: 'Chọn Tháng'),
                     items: List.generate(12, (index) => index + 1).map((m) {
-                      return DropdownMenuItem(value: m, child: Text('Tháng $m'));
+                      return DropdownMenuItem(
+                          value: m, child: Text('Tháng $m'));
                     }).toList(),
                     onChanged: (val) {
-                      if (val != null) setDialogState(() => selectedMonth = val);
+                      if (val != null)
+                        setDialogState(() => selectedMonth = val);
                     },
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<int>(
                     value: selectedYear,
                     decoration: const InputDecoration(labelText: 'Chọn Năm'),
-                    items: List.generate(5, (index) => DateTime.now().year - index).map((y) {
+                    items:
+                        List.generate(5, (index) => DateTime.now().year - index)
+                            .map((y) {
                       return DropdownMenuItem(value: y, child: Text('Năm $y'));
                     }).toList(),
                     onChanged: (val) {
@@ -546,10 +683,13 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+                  child:
+                      const Text('Hủy', style: TextStyle(color: Colors.grey)),
                 ),
                 ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white),
                   onPressed: () {
                     Navigator.pop(context);
                     _exportMonthlyReport(invoices, selectedMonth, selectedYear);
@@ -570,21 +710,24 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
   // ═══════════════════════════════════════════════
   Widget _buildRevenueTab(List<QueryDocumentSnapshot> invoices) {
     final totalRevenue = _calculateTotalRevenue(invoices);
-    final double averageOrderValue = invoices.isNotEmpty ? totalRevenue / invoices.length : 0.0;
+    final double averageOrderValue =
+        invoices.isNotEmpty ? totalRevenue / invoices.length : 0.0;
 
     // Calculate weekly arrays
     final List<double> thisMonthWeeks = [0, 0, 0, 0];
     final List<double> lastMonthWeeks = [0, 0, 0, 0];
     _calculateWeeklyRevenue(invoices, thisMonthWeeks, lastMonthWeeks);
 
-    final double maxWeekly = [...thisMonthWeeks, ...lastMonthWeeks].reduce((a, b) => a > b ? a : b);
+    final double maxWeekly =
+        [...thisMonthWeeks, ...lastMonthWeeks].reduce((a, b) => a > b ? a : b);
 
     // Calculate 7-day daily arrays
     final List<double> thisMonthDays = List.filled(7, 0.0);
     final List<double> lastMonthDays = List.filled(7, 0.0);
     _calculateDailyRevenue7Days(invoices, thisMonthDays, lastMonthDays);
 
-    final double maxDaily = [...thisMonthDays, ...lastMonthDays].reduce((a, b) => a > b ? a : b);
+    final double maxDaily =
+        [...thisMonthDays, ...lastMonthDays].reduce((a, b) => a > b ? a : b);
 
     // --- Parse top popular dishes ---
     final Map<String, int> dishQuantities = {};
@@ -615,30 +758,46 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Hệ Thống Quản Trị & Báo Cáo Doanh Thu', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary)),
+              const Text('Hệ Thống Quản Trị & Báo Cáo Doanh Thu',
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary)),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.secondary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () => _showSelectMonthReportDialog(invoices),
                 icon: const Icon(Icons.print),
-                label: const Text('Xuất báo cáo tháng', style: TextStyle(fontWeight: FontWeight.bold)),
+                label: const Text('Xuất báo cáo tháng',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // KPI Cards
           Row(
             children: [
-              _buildKpiCard('Tổng doanh thu', _formatPrice(totalRevenue.toInt()), Icons.monetization_on, Colors.green),
+              _buildKpiCard(
+                  'Tổng doanh thu',
+                  _formatPrice(totalRevenue.toInt()),
+                  Icons.monetization_on,
+                  Colors.green),
               const SizedBox(width: 16),
-              _buildKpiCard('Tổng số đơn', '${invoices.length} đơn', Icons.receipt_long, Colors.blue),
+              _buildKpiCard('Tổng số đơn', '${invoices.length} đơn',
+                  Icons.receipt_long, Colors.blue),
               const SizedBox(width: 16),
-              _buildKpiCard('Trung bình đơn', _formatPrice(averageOrderValue.toInt()), Icons.calculate, Colors.orange),
+              _buildKpiCard(
+                  'Trung bình đơn',
+                  _formatPrice(averageOrderValue.toInt()),
+                  Icons.calculate,
+                  Colors.orange),
             ],
           ),
           const SizedBox(height: 24),
@@ -661,43 +820,67 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))
+                              BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5))
                             ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Doanh thu theo tuần (Tháng này)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                              const Text('Doanh thu theo tuần (Tháng này)',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primary)),
                               const SizedBox(height: 12),
                               Expanded(
                                 child: BarChart(
                                   BarChartData(
                                     alignment: BarChartAlignment.spaceAround,
-                                    maxY: maxWeekly > 0 ? maxWeekly * 1.2 : 1000000,
+                                    maxY: maxWeekly > 0
+                                        ? maxWeekly * 1.2
+                                        : 1000000,
                                     barTouchData: BarTouchData(
                                       touchTooltipData: BarTouchTooltipData(
-                                        getTooltipColor: (_) => AppColors.primary,
-                                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                        getTooltipColor: (_) =>
+                                            AppColors.primary,
+                                        getTooltipItem:
+                                            (group, groupIndex, rod, rodIndex) {
                                           return BarTooltipItem(
                                             _formatPrice(rod.toY.toInt()),
-                                            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                            const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
                                           );
                                         },
                                       ),
                                     ),
                                     titlesData: FlTitlesData(
-                                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                      leftTitles: const AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
+                                      topTitles: const AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
+                                      rightTitles: const AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
                                       bottomTitles: AxisTitles(
                                         sideTitles: SideTitles(
                                           showTitles: true,
                                           reservedSize: 28,
-                                          getTitlesWidget: (double value, TitleMeta meta) {
+                                          getTitlesWidget:
+                                              (double value, TitleMeta meta) {
                                             final int index = value.toInt();
                                             return SideTitleWidget(
                                               meta: meta,
-                                              child: Text('Tuần ${index + 1}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                              child: Text('Tuần ${index + 1}',
+                                                  style: const TextStyle(
+                                                      fontSize: 11,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
                                             );
                                           },
                                         ),
@@ -711,7 +894,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                                             toY: thisMonthWeeks[i],
                                             color: AppColors.primary,
                                             width: 24,
-                                            borderRadius: const BorderRadius.only(
+                                            borderRadius:
+                                                const BorderRadius.only(
                                               topLeft: Radius.circular(6),
                                               topRight: Radius.circular(6),
                                             ),
@@ -735,25 +919,41 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))
+                              BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5))
                             ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text('So sánh với tháng trước', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                                  const Text('So sánh với tháng trước',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primary)),
                                   Row(
                                     children: [
-                                      Container(width: 10, height: 10, color: Colors.grey.shade400),
+                                      Container(
+                                          width: 10,
+                                          height: 10,
+                                          color: Colors.grey.shade400),
                                       const SizedBox(width: 4),
-                                      const Text('Tháng trước', style: TextStyle(fontSize: 11)),
+                                      const Text('Tháng trước',
+                                          style: TextStyle(fontSize: 11)),
                                       const SizedBox(width: 12),
-                                      Container(width: 10, height: 10, color: AppColors.secondary),
+                                      Container(
+                                          width: 10,
+                                          height: 10,
+                                          color: AppColors.secondary),
                                       const SizedBox(width: 4),
-                                      const Text('Tháng này', style: TextStyle(fontSize: 11)),
+                                      const Text('Tháng này',
+                                          style: TextStyle(fontSize: 11)),
                                     ],
                                   )
                                 ],
@@ -764,14 +964,20 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                                   LineChartData(
                                     lineTouchData: LineTouchData(
                                       touchTooltipData: LineTouchTooltipData(
-                                        getTooltipColor: (_) => AppColors.primary,
+                                        getTooltipColor: (_) =>
+                                            AppColors.primary,
                                         getTooltipItems: (touchedSpots) {
                                           return touchedSpots.map((spot) {
-                                            final isThisMonth = spot.barIndex == 1;
-                                            final legend = isThisMonth ? 'Tháng này' : 'Tháng trước';
+                                            final isThisMonth =
+                                                spot.barIndex == 1;
+                                            final legend = isThisMonth
+                                                ? 'Tháng này'
+                                                : 'Tháng trước';
                                             return LineTooltipItem(
                                               '$legend (Ngày ${spot.x.toInt() + 1})\n${_formatPrice(spot.y.toInt())}',
-                                              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                              const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
                                             );
                                           }).toList();
                                         },
@@ -779,19 +985,30 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                                     ),
                                     gridData: const FlGridData(show: true),
                                     titlesData: FlTitlesData(
-                                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                      leftTitles: const AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
+                                      topTitles: const AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
+                                      rightTitles: const AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false)),
                                       bottomTitles: AxisTitles(
                                         sideTitles: SideTitles(
                                           showTitles: true,
                                           reservedSize: 28,
-                                          getTitlesWidget: (double value, TitleMeta meta) {
+                                          getTitlesWidget:
+                                              (double value, TitleMeta meta) {
                                             final int day = value.toInt() + 1;
                                             if (day >= 1 && day <= 7) {
                                               return SideTitleWidget(
                                                 meta: meta,
-                                                child: Text('N. $day', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                                                child: Text('N. $day',
+                                                    style: const TextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
                                               );
                                             }
                                             return const SizedBox();
@@ -801,15 +1018,21 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                                     ),
                                     borderData: FlBorderData(
                                       show: true,
-                                      border: Border.all(color: Colors.grey.shade300, width: 1),
+                                      border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 1),
                                     ),
                                     minX: 0,
                                     maxX: 6,
                                     minY: 0,
-                                    maxY: maxDaily > 0 ? maxDaily * 1.2 : 1000000,
+                                    maxY:
+                                        maxDaily > 0 ? maxDaily * 1.2 : 1000000,
                                     lineBarsData: [
                                       LineChartBarData(
-                                        spots: List.generate(7, (i) => FlSpot(i.toDouble(), lastMonthDays[i])),
+                                        spots: List.generate(
+                                            7,
+                                            (i) => FlSpot(i.toDouble(),
+                                                lastMonthDays[i])),
                                         isCurved: true,
                                         color: Colors.grey.shade400,
                                         barWidth: 4,
@@ -818,7 +1041,10 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                                         belowBarData: BarAreaData(show: false),
                                       ),
                                       LineChartBarData(
-                                        spots: List.generate(7, (i) => FlSpot(i.toDouble(), thisMonthDays[i])),
+                                        spots: List.generate(
+                                            7,
+                                            (i) => FlSpot(i.toDouble(),
+                                                thisMonthDays[i])),
                                         isCurved: true,
                                         color: AppColors.secondary,
                                         barWidth: 4,
@@ -847,17 +1073,25 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))
+                        BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5))
                       ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Top 15 món ăn yêu thích nhất', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                        const Text('Top 15 món ăn yêu thích nhất',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary)),
                         const SizedBox(height: 24),
                         Expanded(
                           child: topDishes.isEmpty
-                              ? const Center(child: Text('Chưa có dữ liệu gọi món'))
+                              ? const Center(
+                                  child: Text('Chưa có dữ liệu gọi món'))
                               : _buildTopDishesList(topDishes),
                         ),
                       ],
@@ -873,8 +1107,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
   }
 
   Widget _buildTablesTab(List<TableModel> tables) {
-    final displayTables = _selectedArea == 'All' 
-        ? tables 
+    final displayTables = _selectedArea == 'All'
+        ? tables
         : tables.where((t) => t.area == _selectedArea).toList();
 
     return Padding(
@@ -885,30 +1119,39 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Quản Trị Bàn Ăn & Khu Vực', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary)),
+              const Text('Quản Trị Bàn Ăn & Khu Vực',
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary)),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.secondary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: _showAddTableDialog,
                 icon: const Icon(Icons.add),
-                label: const Text('Thêm bàn mới', style: TextStyle(fontWeight: FontWeight.bold)),
+                label: const Text('Thêm bàn mới',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],
           ),
           const SizedBox(height: 24),
-
           Row(
             children: ['All', 'A', 'B', 'C'].map((area) {
               final isSel = _selectedArea == area;
               return Padding(
                 padding: const EdgeInsets.only(right: 12),
                 child: ChoiceChip(
-                  label: Text(area == 'All' ? 'Tất cả khu vực' : 'Khu vực $area', 
-                      style: TextStyle(color: isSel ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
+                  label: Text(
+                      area == 'All' ? 'Tất cả khu vực' : 'Khu vực $area',
+                      style: TextStyle(
+                          color: isSel ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.bold)),
                   selected: isSel,
                   selectedColor: AppColors.primary,
                   backgroundColor: Colors.white,
@@ -924,12 +1167,13 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
             }).toList(),
           ),
           const SizedBox(height: 24),
-
           Expanded(
             child: displayTables.isEmpty
-                ? const Center(child: Text('Không có bàn ăn nào trong khu vực này.'))
+                ? const Center(
+                    child: Text('Không có bàn ăn nào trong khu vực này.'))
                 : GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 6,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
@@ -964,7 +1208,11 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                                 color: color,
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
-                                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))
+                                  BoxShadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.05),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2))
                                 ],
                               ),
                               padding: const EdgeInsets.all(12),
@@ -972,9 +1220,16 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(table.id, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                    Text(table.id,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
                                     const SizedBox(height: 4),
-                                    Text(statusText, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                                    Text(statusText,
+                                        style: const TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 13)),
                                   ],
                                 ),
                               ),
@@ -991,8 +1246,10 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                                 ),
                                 child: IconButton(
                                   padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                                  icon: const Icon(Icons.close, color: Colors.white, size: 16),
+                                  constraints: const BoxConstraints(
+                                      minWidth: 28, minHeight: 28),
+                                  icon: const Icon(Icons.close,
+                                      color: Colors.white, size: 16),
                                   onPressed: () => _deleteTable(table),
                                 ),
                               ),
@@ -1018,7 +1275,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
         final List<TableModel> allTables = [];
         if (tablesSnapshot.hasData) {
           for (var doc in tablesSnapshot.data!.docs) {
-            allTables.add(TableModel.fromMap(doc.id, doc.data() as Map<String, dynamic>));
+            allTables.add(
+                TableModel.fromMap(doc.id, doc.data() as Map<String, dynamic>));
           }
           allTables.sort((a, b) => a.id.compareTo(b.id));
         }
@@ -1026,14 +1284,17 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
-            title: const Text('Hệ Thống Quản Trị & Báo Cáo Doanh Thu', style: TextStyle(fontFamily: 'Playfair Display', fontWeight: FontWeight.bold)),
+            title: const Text('Hệ Thống Quản Trị & Báo Cáo Doanh Thu',
+                style: TextStyle(
+                    fontFamily: 'Playfair Display',
+                    fontWeight: FontWeight.bold)),
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout),
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/'); 
+                  Navigator.pushReplacementNamed(context, '/');
                 },
               ),
             ],
@@ -1047,16 +1308,19 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                 child: Column(
                   children: [
                     const SizedBox(height: 32),
-                    const Icon(Icons.admin_panel_settings, size: 80, color: AppColors.primary),
+                    const Icon(Icons.admin_panel_settings,
+                        size: 80, color: AppColors.primary),
                     const SizedBox(height: 16),
-                    const Text('Quản lý chung', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const Text('Quản lý chung',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 32),
-                    
                     ListTile(
                       leading: const Icon(Icons.dashboard),
                       title: const Text('Doanh thu'),
                       selected: _selectedIndex == 0,
-                      selectedTileColor: AppColors.primary.withValues(alpha: 0.1),
+                      selectedTileColor:
+                          AppColors.primary.withValues(alpha: 0.1),
                       selectedColor: AppColors.primary,
                       onTap: () => setState(() => _selectedIndex = 0),
                     ),
@@ -1064,7 +1328,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                       leading: const Icon(Icons.table_restaurant),
                       title: const Text('Quản lý Bàn ăn'),
                       selected: _selectedIndex == 1,
-                      selectedTileColor: AppColors.primary.withValues(alpha: 0.1),
+                      selectedTileColor:
+                          AppColors.primary.withValues(alpha: 0.1),
                       selectedColor: AppColors.primary,
                       onTap: () => setState(() => _selectedIndex = 1),
                     ),
@@ -1072,14 +1337,15 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                       leading: const Icon(Icons.restaurant_menu),
                       title: const Text('Quản lý Món ăn'),
                       selected: _selectedIndex == 2,
-                      selectedTileColor: AppColors.primary.withValues(alpha: 0.1),
+                      selectedTileColor:
+                          AppColors.primary.withValues(alpha: 0.1),
                       selectedColor: AppColors.primary,
                       onTap: () => setState(() => _selectedIndex = 2),
                     ),
                   ],
                 ),
               ),
-              
+
               // Right Content Area
               Expanded(
                 child: _selectedIndex == 2
@@ -1087,10 +1353,15 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                     : _selectedIndex == 1
                         ? _buildTablesTab(allTables)
                         : StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance.collection('invoices').orderBy('createdAt', descending: true).snapshots(),
+                            stream: FirebaseFirestore.instance
+                                .collection('invoices')
+                                .orderBy('createdAt', descending: true)
+                                .snapshots(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return const Center(child: CircularProgressIndicator());
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
                               }
 
                               final invoices = snapshot.data?.docs ?? [];
@@ -1113,23 +1384,32 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))
+            BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 5))
           ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
               child: Icon(icon, size: 40, color: color),
             ),
             const SizedBox(width: 24),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 16, color: Colors.grey)),
+                Text(title,
+                    style: const TextStyle(fontSize: 16, color: Colors.grey)),
                 const SizedBox(height: 8),
-                Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                Text(value,
+                    style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary)),
               ],
             )
           ],
@@ -1139,7 +1419,8 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
   }
 
   Widget _buildTopDishesList(List<MapEntry<String, int>> topDishes) {
-    final double maxQty = topDishes.isNotEmpty ? topDishes.first.value.toDouble() : 1.0;
+    final double maxQty =
+        topDishes.isNotEmpty ? topDishes.first.value.toDouble() : 1.0;
 
     return ListView.builder(
       itemCount: topDishes.length,
@@ -1159,13 +1440,17 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                   Expanded(
                     child: Text(
                       '${index + 1}. $name',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 14),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Text(
                     '$qty phần',
-                    style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 14),
+                    style: const TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14),
                   ),
                 ],
               ),

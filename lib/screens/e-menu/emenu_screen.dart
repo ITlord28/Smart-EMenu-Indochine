@@ -24,10 +24,12 @@ class EMenuScreen extends StatefulWidget {
 }
 
 class _EMenuScreenState extends State<EMenuScreen> {
-  int _activeCategoryIdx = 1; // Mặc định hiển thị danh mục Đồ Nhúng Lẩu (Index 1)
+  int _activeCategoryIdx =
+      1; // Mặc định hiển thị danh mục Đồ Nhúng Lẩu (Index 1)
   MenuItem? _selectedItem; // Món ăn đang được nhấp chọn xem chi tiết
   int _quantity = 1; // Số lượng món đang chọn để thêm vào giỏ hàng
-  int _activeTab = 0; // Tab hiển thị chính (0: Thực đơn, 1: Giỏ hàng, 2: Lịch sử gọi món của phiên này)
+  int _activeTab =
+      0; // Tab hiển thị chính (0: Thực đơn, 1: Giỏ hàng, 2: Lịch sử gọi món của phiên này)
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
@@ -104,8 +106,9 @@ class _EMenuScreenState extends State<EMenuScreen> {
   Future<void> _updateTableStatusToOccupied() async {
     try {
       final normalizedId = widget.tableInfo.replaceAll('-', '');
-      final tableRef = FirebaseFirestore.instance.collection('tables').doc(normalizedId);
-      
+      final tableRef =
+          FirebaseFirestore.instance.collection('tables').doc(normalizedId);
+
       final doc = await tableRef.get();
       if (doc.exists) {
         final data = doc.data() as Map<String, dynamic>;
@@ -162,31 +165,43 @@ class _EMenuScreenState extends State<EMenuScreen> {
                   : _activeTab == 2
                       ? OrderHistoryWidget(tableInfo: widget.tableInfo)
                       : StreamBuilder<QuerySnapshot>(
-                          stream: FirebaseFirestore.instance.collection('menu').snapshots(),
+                          stream: FirebaseFirestore.instance
+                              .collection('menu')
+                              .snapshots(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
 
-                            final allItems = snapshot.data?.docs.map((doc) => MenuItem.fromMap(doc.id, doc.data() as Map<String, dynamic>)).where((item) => item.isAvailable).toList() ?? [];
+                            final allItems = snapshot.data?.docs
+                                    .map((doc) => MenuItem.fromMap(doc.id,
+                                        doc.data() as Map<String, dynamic>))
+                                    .where((item) => item.isAvailable)
+                                    .toList() ??
+                                [];
 
                             // Group items by category
                             final Map<String, List<MenuItem>> grouped = {};
                             for (var item in allItems) {
-                              if (!grouped.containsKey(item.category)) grouped[item.category] = [];
+                              if (!grouped.containsKey(item.category))
+                                grouped[item.category] = [];
                               grouped[item.category]!.add(item);
                             }
 
                             final categories = grouped.keys.toList();
                             if (categories.isEmpty) {
-                              return const Center(child: Text('Chưa có thực đơn'));
+                              return const Center(
+                                  child: Text('Chưa có thực đơn'));
                             }
 
                             if (_activeCategoryIdx >= categories.length) {
                               _activeCategoryIdx = 0; // Reset if out of bounds
                             }
 
-                            final currentCategoryItems = grouped[categories[_activeCategoryIdx]]!;
+                            final currentCategoryItems =
+                                grouped[categories[_activeCategoryIdx]]!;
 
                             return Row(
                               children: [
@@ -194,7 +209,10 @@ class _EMenuScreenState extends State<EMenuScreen> {
                                 _buildCategorySidebarDynamic(categories),
 
                                 // ═══════ 3. CENTER FOOD GRID ═══════
-                                Expanded(child: _buildFoodGridDynamic(categories[_activeCategoryIdx], currentCategoryItems)),
+                                Expanded(
+                                    child: _buildFoodGridDynamic(
+                                        categories[_activeCategoryIdx],
+                                        currentCategoryItems)),
 
                                 // ═══════ 4. RIGHT DETAIL PANEL ═══════
                                 if (_selectedItem != null)
@@ -419,7 +437,8 @@ class _EMenuScreenState extends State<EMenuScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.primary : Colors.transparent,
+                      color:
+                          isSelected ? AppColors.primary : Colors.transparent,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -434,7 +453,8 @@ class _EMenuScreenState extends State<EMenuScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: isSelected ? AppColors.primary : Colors.grey[400],
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                       fontSize: 12,
                     ),
                     maxLines: 2,
@@ -465,7 +485,10 @@ class _EMenuScreenState extends State<EMenuScreen> {
   Widget _buildFoodGridDynamic(String categoryName, List<MenuItem> rawItems) {
     List<MenuItem> items = List.from(rawItems);
     if (_searchQuery.isNotEmpty) {
-      items = items.where((item) => item.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+      items = items
+          .where((item) =>
+              item.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .toList();
     }
 
     return Container(
@@ -505,8 +528,8 @@ class _EMenuScreenState extends State<EMenuScreen> {
                       hintText: 'Tìm món ăn...',
                       hintStyle:
                           TextStyle(fontSize: 13, color: Colors.grey[400]),
-                      prefixIcon: Icon(Icons.search,
-                          size: 20, color: Colors.grey[400]),
+                      prefixIcon:
+                          Icon(Icons.search, size: 20, color: Colors.grey[400]),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     ),
@@ -758,8 +781,8 @@ class _EMenuScreenState extends State<EMenuScreen> {
                         color: Colors.black.withValues(alpha: 0.4),
                         shape: BoxShape.circle,
                       ),
-                      child:
-                          const Icon(Icons.close, color: Colors.white, size: 20),
+                      child: const Icon(Icons.close,
+                          color: Colors.white, size: 20),
                     ),
                   ),
                 ),

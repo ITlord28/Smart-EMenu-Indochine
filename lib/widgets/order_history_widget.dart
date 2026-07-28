@@ -36,7 +36,8 @@ class OrderHistoryWidget extends StatelessWidget {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -61,11 +62,14 @@ class OrderHistoryWidget extends StatelessWidget {
               stream: repo.watchActiveOrders(tableInfo),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  return const Center(
+                      child:
+                          CircularProgressIndicator(color: AppColors.primary));
                 }
 
                 if (snapshot.hasError) {
-                  return const Center(child: Text('Có lỗi xảy ra khi tải dữ liệu'));
+                  return const Center(
+                      child: Text('Có lỗi xảy ra khi tải dữ liệu'));
                 }
 
                 final orders = snapshot.data ?? [];
@@ -75,11 +79,13 @@ class OrderHistoryWidget extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.receipt_long, size: 80, color: Colors.grey[300]),
+                        Icon(Icons.receipt_long,
+                            size: 80, color: Colors.grey[300]),
                         const SizedBox(height: 16),
                         Text(
                           'Bàn này chưa gọi món nào',
-                          style: TextStyle(color: Colors.grey[500], fontSize: 20),
+                          style:
+                              TextStyle(color: Colors.grey[500], fontSize: 20),
                         ),
                       ],
                     ),
@@ -100,29 +106,36 @@ class OrderHistoryWidget extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final order = orders[index];
                           final dateFormat = DateFormat('HH:mm - dd/MM/yyyy');
-                          
+
                           return Card(
                             margin: const EdgeInsets.only(bottom: 16),
                             elevation: 2,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                             child: ExpansionTile(
                               title: Text(
                                 'Đơn hàng lúc ${dateFormat.format(order.createdAt)}',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                               subtitle: Text(
                                 'Tổng tiền: ${_formatPrice(order.totalAmount.toInt())}',
-                                style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold),
                               ),
                               children: order.orderItems?.map((item) {
-                                return ListTile(
-                                  title: Text('${item.quantity} x ${item.name}'),
-                                  trailing: Text(
-                                    _formatPrice(item.total.toInt()),
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                );
-                              }).toList() ?? [],
+                                    return ListTile(
+                                      title: Text(
+                                          '${item.quantity} x ${item.name}'),
+                                      trailing: Text(
+                                        _formatPrice(item.total.toInt()),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    );
+                                  }).toList() ??
+                                  [],
                             ),
                           );
                         },
@@ -155,11 +168,14 @@ class OrderHistoryWidget extends StatelessWidget {
                       width: double.infinity,
                       height: 60,
                       child: ElevatedButton.icon(
-                        onPressed: () => PdfInvoiceHelper.generateAndPrintInvoice(orders, tableInfo),
+                        onPressed: () =>
+                            PdfInvoiceHelper.generateAndPrintInvoice(
+                                orders, tableInfo),
                         icon: const Icon(Icons.print, size: 28),
                         label: const Text(
                           'In hoá đơn tạm tính',
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.secondary,

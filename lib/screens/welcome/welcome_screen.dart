@@ -14,7 +14,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  
   /// Hộp thoại chọn Bàn & Khu vực
   /// Cho phép thiết lập số bàn của thiết bị (ví dụ: A-01, B-05, C-12)
   void _showTableSelectionDialog() {
@@ -28,7 +27,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               title: const Text(
                 'Thiết Lập Số Bàn Thiết Bị',
                 style: TextStyle(
@@ -49,7 +49,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         items: ['A', 'B', 'C'].map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
-                            child: Text(value, style: const TextStyle(fontSize: 18)),
+                            child: Text(value,
+                                style: const TextStyle(fontSize: 18)),
                           );
                         }).toList(),
                         onChanged: (newValue) {
@@ -67,10 +68,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       const SizedBox(width: 16),
                       DropdownButton<String>(
                         value: selectedTable,
-                        items: List.generate(20, (index) => (index + 1).toString().padLeft(2, '0')).map((String value) {
+                        items: List.generate(
+                                20,
+                                (index) =>
+                                    (index + 1).toString().padLeft(2, '0'))
+                            .map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
-                            child: Text(value, style: const TextStyle(fontSize: 18)),
+                            child: Text(value,
+                                style: const TextStyle(fontSize: 18)),
                           );
                         }).toList(),
                         onChanged: (newValue) {
@@ -86,7 +92,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+                  child:
+                      const Text('Hủy', style: TextStyle(color: Colors.grey)),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -95,14 +102,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => EMenuScreen(tableInfo: '$selectedArea-$selectedTable'),
+                        builder: (_) => EMenuScreen(
+                            tableInfo: '$selectedArea-$selectedTable'),
                       ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                   child: const Text('Xác nhận'),
                 ),
@@ -127,7 +136,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             top: 20,
             right: 20,
             child: IconButton(
-              icon: const Icon(Icons.settings, color: AppColors.primary, size: 28),
+              icon: const Icon(Icons.settings,
+                  color: AppColors.primary, size: 28),
               tooltip: 'Đăng nhập nhân viên',
               onPressed: () {
                 Navigator.pushNamed(context, '/login');
@@ -139,27 +149,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                 // LOGO nhà hàng
-                 Hero(
-                   tag: 'logo',
-                   child: Container(
-                     width: 180,
-                     height: 180,
-                     decoration: BoxDecoration(
-                       color: Colors.white,
-                       shape: BoxShape.circle,
-                       boxShadow: [
-                         BoxShadow(
-                           color: Colors.black.withValues(alpha: 0.1),
-                           blurRadius: 20,
-                           offset: const Offset(0, 10),
-                         )
-                       ],
-                     ),
-                     child: const Icon(Icons.restaurant_menu, size: 80, color: AppColors.primary),
-                   ),
-                 ),
-                 const SizedBox(height: 30),
+                // LOGO nhà hàng
+                Hero(
+                  tag: 'logo',
+                  child: Container(
+                    width: 180,
+                    height: 180,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        )
+                      ],
+                    ),
+                    child: const Icon(Icons.restaurant_menu,
+                        size: 80, color: AppColors.primary),
+                  ),
+                ),
+                const SizedBox(height: 30),
 
                 // Tên nhà hàng
                 const Text(
@@ -200,7 +211,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     ),
                     child: const Text(
                       "KHỞI ĐỘNG E-MENU GỌI MÓN",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

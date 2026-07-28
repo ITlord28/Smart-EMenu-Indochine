@@ -32,23 +32,42 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Tên món')),
+                  TextField(
+                      controller: nameCtrl,
+                      decoration: const InputDecoration(labelText: 'Tên món')),
                   const SizedBox(height: 8),
-                  TextField(controller: categoryCtrl, decoration: const InputDecoration(labelText: 'Danh mục (Thực đơn chính, Đồ uống,...)')),
+                  TextField(
+                      controller: categoryCtrl,
+                      decoration: const InputDecoration(
+                          labelText: 'Danh mục (Thực đơn chính, Đồ uống,...)')),
                   const SizedBox(height: 8),
-                  TextField(controller: priceCtrl, decoration: const InputDecoration(labelText: 'Giá (VND)'), keyboardType: TextInputType.number),
+                  TextField(
+                      controller: priceCtrl,
+                      decoration: const InputDecoration(labelText: 'Giá (VND)'),
+                      keyboardType: TextInputType.number),
                   const SizedBox(height: 8),
-                  TextField(controller: tfpCtrl, decoration: const InputDecoration(labelText: 'Thời gian làm (phút)'), keyboardType: TextInputType.number),
+                  TextField(
+                      controller: tfpCtrl,
+                      decoration: const InputDecoration(
+                          labelText: 'Thời gian làm (phút)'),
+                      keyboardType: TextInputType.number),
                   const SizedBox(height: 8),
-                  TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Mô tả')),
+                  TextField(
+                      controller: descCtrl,
+                      decoration: const InputDecoration(labelText: 'Mô tả')),
                   const SizedBox(height: 8),
-                  TextField(controller: imgUrlCtrl, decoration: const InputDecoration(labelText: 'Link Ảnh (URL)')),
+                  TextField(
+                      controller: imgUrlCtrl,
+                      decoration:
+                          const InputDecoration(labelText: 'Link Ảnh (URL)')),
                 ],
               ),
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Huỷ')),
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Huỷ')),
             ElevatedButton(
               onPressed: () async {
                 final newItem = {
@@ -63,10 +82,15 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 };
 
                 if (isEditing) {
-                  await FirebaseFirestore.instance.collection('menu').doc(item.id).update(newItem);
+                  await FirebaseFirestore.instance
+                      .collection('menu')
+                      .doc(item.id)
+                      .update(newItem);
                 } else {
                   // Add new doc with random ID
-                  await FirebaseFirestore.instance.collection('menu').add(newItem);
+                  await FirebaseFirestore.instance
+                      .collection('menu')
+                      .add(newItem);
                 }
                 if (context.mounted) Navigator.pop(context);
               },
@@ -80,20 +104,23 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
 
   Future<void> _deleteItem(String id) async {
     final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Xác nhận xoá'),
-        content: const Text('Bạn có chắc muốn xoá món này khỏi thực đơn?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Huỷ')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-            onPressed: () => Navigator.pop(context, true), 
-            child: const Text('Xoá')
-          ),
-        ],
-      )
-    );
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Xác nhận xoá'),
+              content:
+                  const Text('Bạn có chắc muốn xoá món này khỏi thực đơn?'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Huỷ')),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white),
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text('Xoá')),
+              ],
+            ));
 
     if (confirm == true) {
       await FirebaseFirestore.instance.collection('menu').doc(id).delete();
@@ -121,7 +148,11 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final items = snapshot.data?.docs.map((doc) => MenuItem.fromMap(doc.id, doc.data() as Map<String, dynamic>)).toList() ?? [];
+          final items = snapshot.data?.docs
+                  .map((doc) => MenuItem.fromMap(
+                      doc.id, doc.data() as Map<String, dynamic>))
+                  .toList() ??
+              [];
 
           return ListView.builder(
             padding: const EdgeInsets.all(24),
@@ -131,10 +162,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               return Card(
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(item.imageUrl.isNotEmpty ? item.imageUrl : 'https://via.placeholder.com/150'),
+                    backgroundImage: NetworkImage(item.imageUrl.isNotEmpty
+                        ? item.imageUrl
+                        : 'https://via.placeholder.com/150'),
                   ),
-                  title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('${item.category}  |  ${item.price}đ  |  TFP: ${item.tfp}p'),
+                  title: Text(item.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(
+                      '${item.category}  |  ${item.price}đ  |  TFP: ${item.tfp}p'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -142,11 +177,18 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                         value: item.isAvailable,
                         activeColor: AppColors.primary,
                         onChanged: (val) {
-                          FirebaseFirestore.instance.collection('menu').doc(item.id).update({'isAvailable': val});
+                          FirebaseFirestore.instance
+                              .collection('menu')
+                              .doc(item.id)
+                              .update({'isAvailable': val});
                         },
                       ),
-                      IconButton(icon: const Icon(Icons.edit, color: Colors.blue), onPressed: () => _showEditDialog(item: item)),
-                      IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => _deleteItem(item.id)),
+                      IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () => _showEditDialog(item: item)),
+                      IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _deleteItem(item.id)),
                     ],
                   ),
                 ),

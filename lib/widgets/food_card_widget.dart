@@ -90,7 +90,8 @@ class FoodCardWidget extends StatelessWidget {
             // ── Tên và Giá ──
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -124,7 +125,8 @@ class FoodCardWidget extends StatelessWidget {
               padding: const EdgeInsets.only(right: 10),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.secondary : AppColors.primary,
                   borderRadius: BorderRadius.circular(20),

@@ -9,7 +9,7 @@ class DummyDataGenerator {
   static Future<void> seedData() async {
     // 1. Seed Users
     await _seedUsers();
-    
+
     // 2. Seed Tables
     await _seedTables();
 
@@ -22,7 +22,7 @@ class DummyDataGenerator {
 
   static Future<void> _seedUsers() async {
     final usersCol = _firestore.collection('users');
-    
+
     // Check if users exist
     final snapshot = await usersCol.limit(1).get();
     if (snapshot.docs.isNotEmpty) return;
@@ -34,26 +34,36 @@ class DummyDataGenerator {
         await usersCol.doc(id).set({
           'role': 'customer',
           'name': 'Bàn $id',
-          'password': 'abc1', 
+          'password': 'abc1',
         });
       }
     }
 
     // Cashiers
-    await usersCol.doc('cashier1').set({'role': 'cashier', 'name': 'Thu ngân 1', 'password': '123'});
-    await usersCol.doc('cashier2').set({'role': 'cashier', 'name': 'Thu ngân 2', 'password': '123'});
+    await usersCol
+        .doc('cashier1')
+        .set({'role': 'cashier', 'name': 'Thu ngân 1', 'password': '123'});
+    await usersCol
+        .doc('cashier2')
+        .set({'role': 'cashier', 'name': 'Thu ngân 2', 'password': '123'});
 
     // Chefs
-    await usersCol.doc('chef1').set({'role': 'chef', 'name': 'Bếp trưởng', 'password': '123'});
-    await usersCol.doc('chef2').set({'role': 'chef', 'name': 'Bếp phó', 'password': '123'});
+    await usersCol
+        .doc('chef1')
+        .set({'role': 'chef', 'name': 'Bếp trưởng', 'password': '123'});
+    await usersCol
+        .doc('chef2')
+        .set({'role': 'chef', 'name': 'Bếp phó', 'password': '123'});
 
     // Manager
-    await usersCol.doc('manager1').set({'role': 'manager', 'name': 'Quản lý', 'password': 'admin'});
+    await usersCol
+        .doc('manager1')
+        .set({'role': 'manager', 'name': 'Quản lý', 'password': 'admin'});
   }
 
   static Future<void> _seedTables() async {
     final tablesCol = _firestore.collection('tables');
-    
+
     final snapshot = await tablesCol.limit(1).get();
     if (snapshot.docs.isNotEmpty) return;
 
@@ -68,7 +78,7 @@ class DummyDataGenerator {
 
   static Future<void> _seedMenu() async {
     final menuCol = _firestore.collection('menu');
-    
+
     final snapshot = await menuCol.limit(1).get();
     if (snapshot.docs.isNotEmpty) return;
 
@@ -128,7 +138,19 @@ class DummyDataGenerator {
     }
 
     final random = Random();
-    final tables = ['A01', 'A02', 'A03', 'A04', 'A05', 'B01', 'B02', 'B03', 'B04', 'C01', 'C02'];
+    final tables = [
+      'A01',
+      'A02',
+      'A03',
+      'A04',
+      'A05',
+      'B01',
+      'B02',
+      'B03',
+      'B04',
+      'C01',
+      'C02'
+    ];
     final paymentMethods = ['cash', 'ewallet', 'bank'];
 
     // We want to generate historical revenue for two months: June 2026 (last month) and July 2026 (this month)
@@ -145,9 +167,11 @@ class DummyDataGenerator {
       final minute = random.nextInt(60);
 
       final checkoutTime = DateTime(currentYear, lastMonth, day, hour, minute);
-      final startedTime = checkoutTime.subtract(Duration(minutes: random.nextInt(60) + 40));
+      final startedTime =
+          checkoutTime.subtract(Duration(minutes: random.nextInt(60) + 40));
 
-      final invoice = _createRandomInvoice(random, tables, dishes, paymentMethods, checkoutTime, startedTime);
+      final invoice = _createRandomInvoice(
+          random, tables, dishes, paymentMethods, checkoutTime, startedTime);
       generatedInvoices.add(invoice);
     }
 
@@ -159,9 +183,11 @@ class DummyDataGenerator {
       final minute = random.nextInt(60);
 
       final checkoutTime = DateTime(currentYear, thisMonth, day, hour, minute);
-      final startedTime = checkoutTime.subtract(Duration(minutes: random.nextInt(60) + 40));
+      final startedTime =
+          checkoutTime.subtract(Duration(minutes: random.nextInt(60) + 40));
 
-      final invoice = _createRandomInvoice(random, tables, dishes, paymentMethods, checkoutTime, startedTime);
+      final invoice = _createRandomInvoice(
+          random, tables, dishes, paymentMethods, checkoutTime, startedTime);
       generatedInvoices.add(invoice);
     }
 
@@ -191,7 +217,8 @@ class DummyDataGenerator {
     double grandTotal = 0;
 
     // Pick unique dishes
-    final shuffledDishes = List<Map<String, dynamic>>.from(dishes)..shuffle(random);
+    final shuffledDishes = List<Map<String, dynamic>>.from(dishes)
+      ..shuffle(random);
     for (int j = 0; j < numItems; j++) {
       final dish = shuffledDishes[j];
       final qty = random.nextInt(2) + 1; // 1 or 2 parts

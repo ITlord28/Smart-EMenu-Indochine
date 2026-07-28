@@ -6,8 +6,7 @@ import '../../models/order.dart';
 import '../../services/order_repository.dart';
 
 class CartDialog extends StatefulWidget {
-  final String tableInfo;
-  const CartDialog({super.key, this.tableInfo = 'Unknown'});
+  const CartDialog({super.key});
 
   @override
   State<CartDialog> createState() => _CartDialogState();
@@ -86,7 +85,10 @@ class _CartDialogState extends State<CartDialog> {
                                       width: 60,
                                       height: 60,
                                       color: Colors.grey.shade200,
-                                      child: const Icon(Icons.image_not_supported, size: 30, color: Colors.grey),
+                                      child: const Icon(
+                                          Icons.image_not_supported,
+                                          size: 30,
+                                          color: Colors.grey),
                                     ),
                                   ),
                                 ),
@@ -95,7 +97,8 @@ class _CartDialogState extends State<CartDialog> {
                                 // Item Details
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         cartItem.item.name,
@@ -122,21 +125,27 @@ class _CartDialogState extends State<CartDialog> {
                                 Row(
                                   children: [
                                     IconButton(
-                                      icon: const Icon(Icons.remove_circle_outline),
+                                      icon: const Icon(
+                                          Icons.remove_circle_outline),
                                       color: Colors.red,
                                       onPressed: () {
-                                        cart.updateQuantity(itemKey, cartItem.quantity - 1);
+                                        cart.updateQuantity(
+                                            itemKey, cartItem.quantity - 1);
                                       },
                                     ),
                                     Text(
                                       '${cartItem.quantity}',
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.add_circle_outline),
+                                      icon:
+                                          const Icon(Icons.add_circle_outline),
                                       color: Colors.green,
                                       onPressed: () {
-                                        cart.updateQuantity(itemKey, cartItem.quantity + 1);
+                                        cart.updateQuantity(
+                                            itemKey, cartItem.quantity + 1);
                                       },
                                     ),
                                   ],
@@ -220,8 +229,7 @@ class _CartDialogState extends State<CartDialog> {
     });
 
     final order = OrderModel(
-      tableInfo: widget.tableInfo,
-      cartItems: cart.items.values.toList(),
+      items: cart.items.values.toList(),
       totalAmount: cart.totalAmount,
       createdAt: DateTime.now(),
     );
@@ -248,7 +256,8 @@ class _CartDialogState extends State<CartDialog> {
               ],
             ),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             margin: const EdgeInsets.all(20),
           ),
         );
@@ -260,7 +269,8 @@ class _CartDialogState extends State<CartDialog> {
             backgroundColor: Colors.red,
             content: const Text('Có lỗi xảy ra khi đặt món. Vui lòng thử lại.'),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             margin: const EdgeInsets.all(20),
           ),
         );
