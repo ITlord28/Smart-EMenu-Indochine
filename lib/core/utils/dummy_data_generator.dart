@@ -108,9 +108,29 @@ class DummyDataGenerator {
   static Future<void> seedRealInvoicesToDatabase() async {
     final invoicesCol = _firestore.collection('invoices');
 
-    // Check if we already have sufficient invoices
-    final snapshot = await invoicesCol.limit(15).get();
-    if (snapshot.docs.length >= 15) return;
+    final now = DateTime.now();
+    final int currentYear = now.year;
+    final int thisMonth = now.month;
+
+    final DateTime lastMonthDate = DateTime(now.year, now.month - 1, 1);
+    final int lastMonth = lastMonthDate.month;
+    final int lastMonthYear = lastMonthDate.year;
+
+    // Check if we already have invoices for the current month
+    final snapshot = await invoicesCol.limit(50).get();
+    bool hasCurrentMonthInvoice = false;
+    for (var doc in snapshot.docs) {
+      final createdAtField = doc.data()['createdAt'];
+      if (createdAtField != null) {
+        final DateTime date = (createdAtField as Timestamp).toDate();
+        if (date.month == thisMonth && date.year == currentYear) {
+          hasCurrentMonthInvoice = true;
+          break;
+        }
+      }
+    }
+
+    if (hasCurrentMonthInvoice && snapshot.docs.length >= 20) return;
 
     // Get list of dishes from Firestore menu collection (or fallback if empty)
     final menuSnapshot = await _firestore.collection('menu').get();
@@ -124,7 +144,6 @@ class DummyDataGenerator {
         });
       }
     } else {
-      // Fallback standard dishes
       dishes = [
         {'name': 'Nước Lẩu Riêu Cua Đồng', 'price': 189000},
         {'name': 'Bắp Bò Tươi Hoa Nhúng Lẩu', 'price': 155000},
@@ -153,20 +172,15 @@ class DummyDataGenerator {
     ];
     final paymentMethods = ['cash', 'ewallet', 'bank'];
 
-    // We want to generate historical revenue for two months: June 2026 (last month) and July 2026 (this month)
-    final int currentYear = 2026; // Match project baseline year
-    final int lastMonth = 6;
-    final int thisMonth = 7;
-
     final List<Map<String, dynamic>> generatedInvoices = [];
 
-    // 1. Generate 25 invoices for June 2026 (last month) distributed across 30 days
+    // 1. Generate 25 invoices for last month distributed across days
     for (int i = 0; i < 25; i++) {
-      final day = random.nextInt(30) + 1;
-      final hour = random.nextInt(12) + 10; // 10:00 to 22:00
+      final day = random.nextInt(28) + 1;
+      final hour = random.nextInt(12) + 10;
       final minute = random.nextInt(60);
 
-      final checkoutTime = DateTime(currentYear, lastMonth, day, hour, minute);
+      final checkoutTime = DateTime(lastMonthYear, lastMonth, day, hour, minute);
       final startedTime =
           checkoutTime.subtract(Duration(minutes: random.nextInt(60) + 40));
 
@@ -175,11 +189,11 @@ class DummyDataGenerator {
       generatedInvoices.add(invoice);
     }
 
-    // 2. Generate 25 invoices for July 2026 (this month) distributed across days 1 to 6 (current time)
-    for (int i = 0; i < 25; i++) {
-      // Assuming today is July 6, distribute randomly from July 1 to July 6
-      final day = random.nextInt(6) + 1;
-      final hour = random.nextInt(12) + 10; // 10:00 to 22:00
+    // 2. Generate 25 invoices for this month up to current day
+    final maxCurrentDay = max(1, now.day);
+    for (int i = 0; i < 30; i++) {
+      final day = random.nextInt(maxCurrentDay) + 1;
+      final hour = random.nextInt(12) + 10;
       final minute = random.nextInt(60);
 
       final checkoutTime = DateTime(currentYear, thisMonth, day, hour, minute);
@@ -194,7 +208,7 @@ class DummyDataGenerator {
     // Write all to Firestore using batch
     final WriteBatch batch = _firestore.batch();
     for (var inv in generatedInvoices) {
-      final docRef = invoicesCol.doc(); // Auto-generated ID
+      final docRef = invoicesCol.doc();
       batch.set(docRef, inv);
     }
 

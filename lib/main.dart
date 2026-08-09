@@ -10,6 +10,8 @@ import 'core/utils/dummy_data_generator.dart';
 import 'package:provider/provider.dart';
 import 'providers/cart_provider.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   print('--- App Starting ---');
@@ -21,16 +23,17 @@ void main() async {
     print('--- Firebase Initialized ---');
   } catch (e) {
     print('--- Firebase Initialization Error: $e ---');
-    // Vẫn tiếp tục chạy app nhưng có thể các tính năng Firebase sẽ lỗi
   }
 
   // Gọi hàm seedData (chạy nền, không block UI)
   DummyDataGenerator.seedData().catchError((e) => print('Seed data error: $e'));
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
+  if (!kIsWeb) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
 
   runApp(
     MultiProvider(

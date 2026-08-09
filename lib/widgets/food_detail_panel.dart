@@ -135,9 +135,35 @@ class _DetailView extends StatelessWidget {
                 item.imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.image_not_supported,
-                      size: 60, color: Colors.grey),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primary,
+                        AppColors.primary.withValues(alpha: 0.85),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.soup_kitchen,
+                            size: 50, color: AppColors.secondary),
+                        const SizedBox(height: 8),
+                        Text(
+                          item.name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;

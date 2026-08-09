@@ -62,9 +62,32 @@ class FoodCardWidget extends StatelessWidget {
                 errorBuilder: (_, __, ___) => Container(
                   width: 90,
                   height: 80,
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.image_not_supported,
-                      color: Colors.grey, size: 28),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primary,
+                        AppColors.primary.withValues(alpha: 0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.restaurant_menu,
+                          color: AppColors.secondary, size: 24),
+                      const SizedBox(height: 2),
+                      Text(
+                        item.name.substring(0, 1).toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
