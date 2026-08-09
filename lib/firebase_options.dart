@@ -44,9 +44,9 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyDIuAWx-VLaB67kIouqj8bmiJBa4BLZci8',
     appId: '1:920557202713:web:c238133877bec73c236988',
     messagingSenderId: '920557202713',
-    projectId: 'device-streaming-34b59fe4',
-    authDomain: 'device-streaming-34b59fe4.firebaseapp.com',
-    storageBucket: 'device-streaming-34b59fe4.firebasestorage.app',
+    projectId: 'csdl-d9373',
+    authDomain: 'csdl-d9373.firebaseapp.com',
+    storageBucket: 'csdl-d9373.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -61,8 +61,8 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyCbo7oGpsCfvgAYZKgCtKRwTg_8zi2PT7o',
     appId: '1:920557202713:ios:7e14d1f189cfeba1236988',
     messagingSenderId: '920557202713',
-    projectId: 'device-streaming-34b59fe4',
-    storageBucket: 'device-streaming-34b59fe4.firebasestorage.app',
+    projectId: 'csdl-d9373',
+    storageBucket: 'csdl-d9373.firebasestorage.app',
     iosBundleId: 'com.example.ungdungDatMonAn',
   );
 
@@ -70,8 +70,8 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyCbo7oGpsCfvgAYZKgCtKRwTg_8zi2PT7o',
     appId: '1:920557202713:ios:7e14d1f189cfeba1236988',
     messagingSenderId: '920557202713',
-    projectId: 'device-streaming-34b59fe4',
-    storageBucket: 'device-streaming-34b59fe4.firebasestorage.app',
+    projectId: 'csdl-d9373',
+    storageBucket: 'csdl-d9373.firebasestorage.app',
     iosBundleId: 'com.example.ungdungDatMonAn',
   );
 
@@ -79,8 +79,8 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyDIuAWx-VLaB67kIouqj8bmiJBa4BLZci8',
     appId: '1:920557202713:web:757c4ddb751099a7236988',
     messagingSenderId: '920557202713',
-    projectId: 'device-streaming-34b59fe4',
-    authDomain: 'device-streaming-34b59fe4.firebaseapp.com',
-    storageBucket: 'device-streaming-34b59fe4.firebasestorage.app',
+    projectId: 'csdl-d9373',
+    authDomain: 'csdl-d9373.firebaseapp.com',
+    storageBucket: 'csdl-d9373.firebasestorage.app',
   );
 }

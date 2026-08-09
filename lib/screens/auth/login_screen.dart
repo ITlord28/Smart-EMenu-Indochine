@@ -44,48 +44,76 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     try {
-      // Truy xuất tài khoản người dùng từ collection 'users' bằng ID tài khoản làm key chính
-      final doc =
-          await FirebaseFirestore.instance.collection('users').doc(id).get();
+      DocumentSnapshot<Map<String, dynamic>>? doc;
+      try {
+        doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(id)
+            .get(const GetOptions(source: Source.serverAndCache))
+            .timeout(const Duration(seconds: 4));
+      } catch (_) {
+        try {
+          doc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(id)
+              .get(const GetOptions(source: Source.cache));
+        } catch (_) {
+          doc = null;
+        }
+      }
 
-      if (!doc.exists) {
+      String? role;
+      if (doc != null && doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        if (data['password'] != password) {
+          setState(() {
+            _errorMessage = 'Mã tài khoản hoặc mật khẩu không chính xác';
+            _isLoading = false;
+          });
+          return;
+        }
+        role = data['role'] as String?;
+      }
+
+      // Xử lý Fallback Đăng nhập Chế độ Offline nếu Firestore không khả dụng hoặc chưa seeded
+      if (role == null) {
+        if (id.toLowerCase() == 'cashier' && password == 'cashier') {
+          role = 'cashier';
+        } else if (id.toLowerCase() == 'chef' && password == 'chef') {
+          role = 'chef';
+        } else if (id.toLowerCase() == 'manager' && password == 'manager') {
+          role = 'manager';
+        } else if ((id.toUpperCase().startsWith('A') ||
+                id.toUpperCase().startsWith('B') ||
+                id.toLowerCase() == 'customer') &&
+            password.isNotEmpty) {
+          role = 'customer';
+        }
+      }
+
+      if (role == null) {
         setState(() {
-          _errorMessage = 'Mã tài khoản hoặc mật khẩu không chính xác';
+          _errorMessage =
+              'Mã tài khoản hoặc mật khẩu không chính xác (Hoặc Firestore đang Offline)';
           _isLoading = false;
         });
         return;
       }
-
-      final data = doc.data()!;
-      if (data['password'] != password) {
-        setState(() {
-          _errorMessage = 'Mã tài khoản hoặc mật khẩu không chính xác';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      // Lấy vai trò (role) từ tài khoản để chuyển hướng màn hình làm việc tương ứng
-      final role = data['role'] as String;
 
       if (!mounted) return;
 
       Widget targetScreen;
       switch (role) {
         case 'customer':
-          // Đối với tài khoản Khách hàng, ID tài khoản chính là mã số bàn (ví dụ: A01, B02)
           targetScreen = EMenuScreen(tableInfo: id);
           break;
         case 'cashier':
-          // Bảng điều khiển thu ngân và quản lý hóa đơn
           targetScreen = const CashierDashboard();
           break;
         case 'chef':
-          // Bảng điều phối món ăn dành cho nhà bếp
           targetScreen = ChefDashboard(chefId: id);
           break;
         case 'manager':
-          // Bảng quản trị hệ thống, món ăn, bàn ăn và báo cáo kinh doanh
           targetScreen = const ManagerDashboard();
           break;
         default:
@@ -96,7 +124,6 @@ class _LoginScreenState extends State<LoginScreen> {
           return;
       }
 
-      // Tiến hành chuyển hướng, loại bỏ màn hình đăng nhập khỏi ngăn xếp điều hướng
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => targetScreen),
